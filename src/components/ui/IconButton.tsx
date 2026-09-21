@@ -22,7 +22,7 @@ export const IconButton = forwardRef<HTMLButtonElement, Props>(function IconButt
       aria-label={label}
       title={label}
       className={cn(
-        'grid size-10 shrink-0 place-items-center rounded-full transition-[transform,background-color] duration-150 active:scale-90',
+        'grid size-11 shrink-0 place-items-center rounded-full transition-[transform,background-color] duration-150 active:scale-90',
         tones[tone],
         className,
       )}

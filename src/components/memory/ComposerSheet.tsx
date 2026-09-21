@@ -82,12 +82,13 @@ export function ComposerSheet({ request, onClose }: Props) {
   const pick = () => fileRef.current?.click()
 
   const choices: Array<{ key: string; icon: ReactNode; label: string; hint: string; onClick: () => void }> = [
-    { key: 'photos', icon: <Images />, label: 'Fotos', hint: 'Del carrete', onClick: pick },
+    // Both start the same memory (photos and/or words); only the first step differs.
+    { key: 'photos', icon: <Images />, label: 'Fotos', hint: 'Texto opcional', onClick: pick },
     {
       key: 'note',
       icon: <PenLine />,
-      label: 'Nota',
-      hint: 'Unas palabras',
+      label: 'Escribir',
+      hint: 'Fotos opcionales',
       onClick: () => {
         setFocusText(true)
         setMode('memory')
@@ -133,12 +134,12 @@ export function ComposerSheet({ request, onClose }: Props) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.04 * i, duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
               onClick={c.onClick}
-              className="flex aspect-[0.92] flex-col items-start justify-between rounded-[22px] bg-surface-2/70 p-4 text-left transition-transform duration-150 active:scale-[0.96]"
+              className="flex aspect-[0.92] flex-col items-start justify-between rounded-[22px] bg-fill p-4 text-left transition-transform duration-150 active:scale-[0.96]"
             >
-              <span className="text-accent [&>svg]:size-[26px] [&>svg]:stroke-[1.6]">{c.icon}</span>
+              <span className="text-accent [&>svg]:size-[30px] [&>svg]:stroke-[1.7]">{c.icon}</span>
               <span>
-                <span className="block text-[17px] font-semibold">{c.label}</span>
-                <span className="block text-[13px] text-muted">{c.hint}</span>
+                <span className="block text-[18px] font-semibold">{c.label}</span>
+                <span className="block text-[14px] text-muted">{c.hint}</span>
               </span>
             </motion.button>
           ))}

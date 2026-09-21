@@ -39,7 +39,7 @@ export function TimelinePage() {
           <Stat value={stats.photos} one="foto" many="fotos" />
           {stats.specialDays > 0 && <Stat value={stats.specialDays} one="día especial" many="días especiales" />}
           {stats.busiestMonth && (
-            <span className="basis-full text-[14px]">El mes con más recuerdos: {stats.busiestMonth}.</span>
+            <span className="basis-full text-[15px]">El mes con más recuerdos: {stats.busiestMonth}.</span>
           )}
         </div>
       )}

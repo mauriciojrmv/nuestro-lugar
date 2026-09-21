@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Bell, Calendar, Camera, Download, Home, LogOut, Moon, Shield, User, UserRound, Users } from 'lucide-react'
 import { cn } from '@/lib/cn'
-import { formatLong } from '@/lib/dates'
+import { formatMedium } from '@/lib/dates'
 import { humanizeError } from '@/lib/errors'
 import { qk } from '@/lib/queryKeys'
 import { useAuth } from '@/providers/AuthProvider'
@@ -105,7 +105,7 @@ export function SettingsPage() {
         <ListRow icon={<Users />} label="Tu persona" detail={partner ? partner.displayName : 'Pendiente'} />
         <ListRow
           icon={<Home />}
-          label="Nombre del espacio"
+          label="Espacio"
           detail={couple?.name}
           chevron
           onClick={() =>
@@ -121,8 +121,8 @@ export function SettingsPage() {
         />
         <ListRow
           icon={<Calendar />}
-          label="Nuestro comienzo"
-          detail={couple?.startDate ? formatLong(couple.startDate) : 'Añadir'}
+          label="Comienzo"
+          detail={couple?.startDate ? formatMedium(couple.startDate) : 'Añadir'}
           chevron
           onClick={() =>
             setEditing({
@@ -145,11 +145,11 @@ export function SettingsPage() {
       </ListGroup>
 
       <ListGroup title="Preferencias" footer="Los avisos aparecen dentro de la app cuando tu pareja agrega algo.">
-        <div className="flex min-h-[52px] items-center gap-3 px-4">
-          <span className="grid size-[30px] place-items-center rounded-[9px] bg-accent-soft text-accent">
-            <Moon className="size-[18px]" />
+        <div className="flex min-h-[58px] items-center gap-3 px-4">
+          <span className="grid size-[34px] shrink-0 place-items-center rounded-[10px] bg-accent-soft text-accent">
+            <Moon className="size-5" />
           </span>
-          <span className="flex-1 text-[17px]">Modo visual</span>
+          <span className="flex-1 text-[17px]">Aspecto</span>
           <Segmented
             value={preference}
             onChange={setPreference}
@@ -182,7 +182,7 @@ export function SettingsPage() {
 
 function Segmented<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: [T, string][] }) {
   return (
-    <div className="flex rounded-[10px] bg-surface-2 p-0.5" role="radiogroup">
+    <div className="flex rounded-[11px] bg-surface-2 p-[3px]" role="radiogroup">
       {options.map(([key, label]) => (
         <button
           key={key}
@@ -190,8 +190,8 @@ function Segmented<T extends string>({ value, onChange, options }: { value: T; o
           aria-checked={value === key}
           onClick={() => onChange(key)}
           className={cn(
-            'h-7 rounded-[8px] px-2.5 text-[13px] font-medium transition-colors',
-            value === key ? 'bg-elevated text-ink shadow-[0_1px_3px_rgb(0_0_0/0.15)]' : 'text-muted',
+            'h-9 rounded-[9px] px-3 text-[14px] font-semibold transition-colors',
+            value === key ? 'bg-elevated text-ink shadow-[0_1px_4px_rgb(0_0_0/0.18)]' : 'text-ink-2',
           )}
         >
           {label}
@@ -249,7 +249,7 @@ function EditSheet({ editing, onClose }: { editing: Editing | null; onClose: () 
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && valid && void save()}
           maxLength={60}
-          className="h-[54px] w-full rounded-[16px] bg-surface-2/60 px-4 text-[17px] outline-none focus:ring-2 focus:ring-accent/60"
+          className="h-[54px] w-full rounded-[16px] bg-fill px-4 text-[17px] outline-none focus:ring-2 focus:ring-accent/60"
         />
         {error && <p className="mt-2 px-1 text-[14px] text-rose">{error}</p>}
       </div>

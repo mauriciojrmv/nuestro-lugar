@@ -23,7 +23,7 @@ export function FavoriteButton({ memory, className }: { memory: Memory; classNam
       aria-pressed={active}
       aria-label={active ? 'Quitar de Momentos' : 'Guardar en Momentos'}
       title={active ? 'Quitar de Momentos' : 'Guardar en Momentos'}
-      className={cn('relative grid size-10 place-items-center rounded-full transition-transform active:scale-90', className)}
+      className={cn('relative grid size-11 place-items-center rounded-full transition-transform active:scale-90', className)}
     >
       <motion.span
         key={bursts}
@@ -31,7 +31,7 @@ export function FavoriteButton({ memory, className }: { memory: Memory; classNam
         animate={{ scale: bursts ? [0.7, 1.28, 1] : 1 }}
         transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
       >
-        <Heart className={cn('size-[22px] transition-colors', active ? 'fill-rose text-rose' : 'text-ink')} strokeWidth={1.8} />
+        <Heart className={cn('size-6 transition-colors', active ? 'fill-rose text-rose' : 'text-ink')} strokeWidth={1.8} />
       </motion.span>
     </button>
   )

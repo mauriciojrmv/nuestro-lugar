@@ -55,7 +55,7 @@ export function CouplePair({
         )}
       </span>
       {showNames && (
-        <span className="text-[13px] font-semibold tracking-[0.06em] text-muted uppercase">
+        <span className="text-[14px] font-semibold tracking-[0.06em] text-ink-2 uppercase">
           {shortName(first)}
           {second && (
             <>

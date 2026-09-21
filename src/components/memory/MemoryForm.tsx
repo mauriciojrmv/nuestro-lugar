@@ -66,7 +66,7 @@ export function MemoryForm({ editing, fields, onFields, photos, onPhotos, onAddP
           <button
             type="button"
             onClick={onAddPhotos}
-            className="mt-2 mb-5 flex h-[88px] w-full items-center justify-center gap-2.5 rounded-[20px] border border-dashed border-muted/35 text-[16px] text-muted transition-colors active:bg-surface-2"
+            className="mt-2 mb-5 flex h-[88px] w-full items-center justify-center gap-2.5 rounded-[20px] border border-dashed border-muted/50 text-[16px] font-medium text-ink-2 transition-colors active:bg-surface-2/80"
           >
             <Images className="size-5" strokeWidth={1.7} />
             Añadir fotos
@@ -79,7 +79,7 @@ export function MemoryForm({ editing, fields, onFields, photos, onPhotos, onAddP
           placeholder="Título"
           maxLength={120}
           enterKeyHint="next"
-          className="w-full bg-transparent text-[26px] leading-tight font-bold tracking-[-0.025em] outline-none placeholder:text-muted/50"
+          className="w-full bg-transparent text-[26px] leading-tight font-bold tracking-[-0.025em] outline-none placeholder:text-muted/70"
         />
         <textarea
           ref={bodyRef}
@@ -88,10 +88,10 @@ export function MemoryForm({ editing, fields, onFields, photos, onPhotos, onAddP
           placeholder="Escribe algo sobre este momento…"
           maxLength={20000}
           rows={3}
-          className="mt-2 w-full resize-none bg-transparent text-[17px] leading-relaxed outline-none placeholder:text-muted/60"
+          className="mt-2 w-full resize-none bg-transparent text-[17px] leading-relaxed outline-none placeholder:text-muted/80"
         />
 
-        <div className="mt-4 overflow-hidden rounded-[20px] bg-surface-2/55">
+        <div className="mt-4 overflow-hidden rounded-[20px] bg-fill">
           <DateRow
             value={fields.date}
             onChange={(date) => set('date', date)}
@@ -99,19 +99,19 @@ export function MemoryForm({ editing, fields, onFields, photos, onPhotos, onAddP
             label="Fecha"
             max={todayISO()}
           />
-          <div className="flex min-h-[52px] items-center gap-3 border-t border-hairline px-4">
-            <MapPin className="size-[20px] text-muted" strokeWidth={1.7} />
+          <div className="flex min-h-[56px] items-center gap-3 border-t border-hairline px-4">
+            <MapPin className="size-[22px] text-muted" strokeWidth={1.8} />
             <input
               value={fields.location ?? ''}
               onChange={(e) => set('location', e.target.value)}
               placeholder="Añadir lugar"
               maxLength={120}
               aria-label="Lugar"
-              className="h-[52px] flex-1 bg-transparent text-[17px] outline-none placeholder:text-muted"
+              className="h-[56px] flex-1 bg-transparent text-[17px] outline-none placeholder:text-muted"
             />
           </div>
           <div className="flex items-center gap-3 border-t border-hairline py-2.5 pl-4">
-            <Sparkles className="size-[20px] shrink-0 text-muted" strokeWidth={1.7} />
+            <Sparkles className="size-[22px] shrink-0 text-muted" strokeWidth={1.8} />
             <div
               className="no-scrollbar flex gap-1.5 overflow-x-auto pr-4 pl-1 [mask-image:linear-gradient(to_right,transparent,black_10px,black_calc(100%-20px),transparent)]"
               role="radiogroup"
@@ -125,8 +125,8 @@ export function MemoryForm({ editing, fields, onFields, photos, onPhotos, onAddP
                   aria-checked={fields.mood === mood}
                   onClick={() => set('mood', fields.mood === mood ? null : mood)}
                   className={cn(
-                    'h-8 shrink-0 rounded-full px-3.5 text-[14px] font-medium transition-colors duration-150',
-                    fields.mood === mood ? 'bg-accent text-[#0B0B0D]' : 'bg-surface text-ink-2',
+                    'h-10 shrink-0 rounded-full px-4 text-[15px] font-medium transition-colors duration-150',
+                    fields.mood === mood ? 'bg-accent-fill text-[#0B0B0D]' : 'bg-surface text-ink-2 ring-1 ring-hairline',
                   )}
                 >
                   {mood}

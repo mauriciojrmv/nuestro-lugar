@@ -31,7 +31,7 @@ export function MonthGrid({ year, month, direction, byDate, letterDates, selecte
     <div>
       <div className="grid grid-cols-7 pb-2">
         {WEEKDAY_INITIALS.map((d, i) => (
-          <span key={i} className="text-center text-[12px] font-semibold text-muted">
+          <span key={i} className="text-center text-[13px] font-semibold text-muted">
             {d}
           </span>
         ))}
@@ -71,8 +71,8 @@ export function MonthGrid({ year, month, direction, byDate, letterDates, selecte
                 >
                   <span
                     className={cn(
-                      'grid size-[30px] place-items-center rounded-full text-[16px] tabular-nums transition-colors duration-200',
-                      isSelected ? 'bg-ink font-semibold text-bg' : isToday ? 'font-bold text-accent' : 'text-ink',
+                      'grid size-[34px] place-items-center rounded-full text-[17px] tabular-nums transition-colors duration-200',
+                      isSelected ? 'bg-ink font-semibold text-bg' : isToday ? 'bg-accent/15 font-bold text-accent' : 'text-ink',
                     )}
                   >
                     {day.day}
@@ -83,9 +83,9 @@ export function MonthGrid({ year, month, direction, byDate, letterDates, selecte
                       frameClassName="aspect-square w-[74%] max-w-[52px] rounded-[9px]"
                     />
                   ) : (
-                    <span className="flex h-1.5 gap-1">
-                      {memories.length > 0 && <span className="size-1.5 rounded-full bg-accent" />}
-                      {hasLetter && <span className="size-1.5 rounded-full bg-rose" />}
+                    <span className="flex h-[7px] gap-1">
+                      {memories.length > 0 && <span className="size-[7px] rounded-full bg-accent" />}
+                      {hasLetter && <span className="size-[7px] rounded-full bg-rose" />}
                     </span>
                   )}
                 </button>

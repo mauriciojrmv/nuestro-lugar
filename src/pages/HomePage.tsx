@@ -27,8 +27,8 @@ export function HomePage() {
     <div className="mx-auto max-w-[640px]">
       {/* Hero */}
       <header className="pt-safe">
-        <div className="flex h-12 items-center lg:h-8">
-          <CouplePair first={me} second={partner} size={26} />
+        <div className="flex h-14 items-center lg:h-10">
+          <CouplePair first={me} second={partner} size={32} />
         </div>
         <div className="animate-rise pt-7 pb-9">
           <p className="eyebrow">
@@ -84,9 +84,9 @@ export function HomePage() {
               >
                 <span>
                   <span className="block text-[19px] font-semibold tracking-[-0.02em]">¿Quieres guardar algo de hoy?</span>
-                  <span className="mt-1 block text-[15px] text-muted">Una foto, unas palabras.</span>
+                  <span className="mt-1 block text-[16px] text-muted">Una foto, unas palabras.</span>
                 </span>
-                <span className="grid size-11 shrink-0 place-items-center rounded-full bg-ink text-bg">
+                <span className="grid size-12 shrink-0 place-items-center rounded-full bg-ink text-bg">
                   <Plus className="size-5" strokeWidth={2.4} />
                 </span>
               </button>
@@ -131,9 +131,9 @@ function RecentActivity({ nameOf, myId, ready }: { nameOf: (id: string | null) =
       <ul>
         {items.map((a) => (
           <li key={a.id}>
-            <Link to={linkFor(a)} className="flex items-baseline justify-between gap-4 rounded-[14px] px-1 py-2.5 active:opacity-60">
-              <span className="text-[15px] text-ink-2">{activityLine(a, nameOf(a.actorId), a.actorId === myId)}</span>
-              <span className="shrink-0 text-[13px] text-muted">{timeAgo(a.createdAt)}</span>
+            <Link to={linkFor(a)} className="flex min-h-12 items-center justify-between gap-4 rounded-[14px] px-1 py-2.5 active:opacity-60">
+              <span className="text-[16px] text-ink-2">{activityLine(a, nameOf(a.actorId), a.actorId === myId)}</span>
+              <span className="shrink-0 text-[14px] text-muted">{timeAgo(a.createdAt)}</span>
             </Link>
           </li>
         ))}

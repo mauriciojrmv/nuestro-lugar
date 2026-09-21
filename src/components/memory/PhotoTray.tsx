@@ -66,7 +66,7 @@ export function PhotoTray({ photos, onChange, onAdd, existing }: Props) {
             <button
               type="button"
               onClick={onAdd}
-              className="grid aspect-square place-items-center rounded-[14px] bg-surface-2/70 text-muted transition-transform active:scale-95"
+              className="grid aspect-square place-items-center rounded-[14px] bg-fill text-muted transition-transform active:scale-95"
               aria-label="Añadir más fotos"
             >
               <Plus className="size-6" strokeWidth={1.8} />
@@ -75,7 +75,7 @@ export function PhotoTray({ photos, onChange, onAdd, existing }: Props) {
         </SortableContext>
       </DndContext>
       {photos.length > 1 && (
-        <p className="mt-2 px-0.5 text-[13px] text-muted">
+        <p className="mt-2.5 px-0.5 text-[14px] text-muted">
           {existing ? 'Mantén pulsada una foto para cambiar el orden.' : 'Toca una foto para usarla de portada. Mantenla pulsada para reordenar.'}
         </p>
       )}
@@ -129,7 +129,7 @@ function SortableThumb({
         )}
       </motion.div>
       {cover && (
-        <span className="pointer-events-none absolute bottom-1.5 left-1.5 rounded-full bg-black/45 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur-md">
+        <span className="pointer-events-none absolute bottom-1.5 left-1.5 rounded-full bg-black/55 px-2.5 py-0.5 text-[12px] font-semibold text-white backdrop-blur-md">
           Portada
         </span>
       )}
@@ -139,9 +139,9 @@ function SortableThumb({
         onTouchStart={(e) => e.stopPropagation()}
         onClick={onRemove}
         aria-label="Quitar foto"
-        className="absolute top-1 right-1 grid size-7 place-items-center rounded-full bg-black/45 text-white backdrop-blur-md transition-transform active:scale-90"
+        className="absolute top-1 right-1 grid size-8 place-items-center rounded-full bg-black/55 text-white ring-1 ring-white/20 backdrop-blur-md transition-transform after:absolute after:-inset-2 after:content-[''] active:scale-90"
       >
-        <X className="size-4" strokeWidth={2.4} />
+        <X className="size-[18px]" strokeWidth={2.6} />
       </button>
     </div>
   )

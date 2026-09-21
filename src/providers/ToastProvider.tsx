@@ -53,7 +53,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               transition={{ type: 'spring', stiffness: 420, damping: 34 }}
               className={cn(
                 'material pointer-events-auto flex max-w-[min(92vw,420px)] items-center gap-2.5 rounded-full py-2.5 pr-3 pl-3.5',
-                'text-[14px] leading-tight font-medium shadow-[0_8px_30px_rgb(0_0_0/0.12)] ring-1 ring-hairline',
+                'text-[15px] leading-tight font-medium shadow-[0_8px_30px_rgb(0_0_0/0.12)] ring-1 ring-hairline',
                 t.tone === 'error' ? 'text-rose' : 'text-ink',
               )}
               onClick={() => dismiss(t.id)}

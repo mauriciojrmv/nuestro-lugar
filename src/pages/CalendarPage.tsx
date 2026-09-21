@@ -74,10 +74,10 @@ export function CalendarPage() {
               </IconButton>
             </div>
           </div>
-          <div className="mt-2 flex h-6 items-center gap-3 text-[14px] text-muted">
+          <div className="mt-2 flex h-7 items-center gap-3 text-[15px] text-muted">
             {monthCount > 0 && <span>{`${monthCount} ${monthCount === 1 ? 'recuerdo' : 'recuerdos'}`}</span>}
             {monthKey !== today.slice(0, 7) && (
-              <button onClick={goToday} className="font-semibold text-accent active:opacity-50">
+              <button onClick={goToday} className="-my-2 py-2 font-semibold text-accent active:opacity-50">
                 Volver a hoy
               </button>
             )}
@@ -132,7 +132,7 @@ function DayPanel({
           <span className="ml-2 font-medium text-muted">{formatDayMonth(date)}</span>
         </h2>
         {!empty && (
-          <Link to={`/dia/${date}`} className="text-[15px] font-semibold text-accent active:opacity-50">
+          <Link to={`/dia/${date}`} className="-my-3 -mr-2 px-2 py-3 text-[16px] font-semibold text-accent active:opacity-50">
             Ver día
           </Link>
         )}
@@ -140,7 +140,7 @@ function DayPanel({
 
       {empty ? (
         <div className="rounded-[22px] bg-surface px-5 py-6">
-          <p className="text-[16px] text-muted">Nada guardado este día.</p>
+          <p className="text-[17px] text-ink-2">Nada guardado este día.</p>
           {date <= today && (
             <Button variant="secondary" className="mt-4" icon={<Plus className="size-[18px]" />} onClick={onAdd}>
               Añadir recuerdo
@@ -159,7 +159,7 @@ function DayPanel({
               </span>
               <span className="min-w-0">
                 <span className="block text-[16px] font-semibold">Cartita para {nameOf(l.recipientId)}</span>
-                <span className="block text-[14px] text-muted">De {nameOf(l.authorId)}</span>
+                <span className="block text-[15px] text-muted">De {nameOf(l.authorId)}</span>
               </span>
             </Link>
           ))}

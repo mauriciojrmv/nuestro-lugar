@@ -81,15 +81,15 @@ export function MemoryDetail({ memory, showDate = true, afterDelete }: Props) {
           {memory.title && (
             <h2 className="mt-1 text-[28px] leading-[1.12] font-bold tracking-[-0.03em] text-balance">{memory.title}</h2>
           )}
-          <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[14px] text-muted">
+          <p className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[15px] text-muted">
             {memory.createdBy && <span>Agregado por {nameOf(memory.createdBy)}</span>}
             {memory.location && (
               <span className="inline-flex items-center gap-1">
-                <MapPin className="size-3.5" strokeWidth={2} />
+                <MapPin className="size-4" strokeWidth={2} />
                 {memory.location}
               </span>
             )}
-            {memory.mood && <span className="rounded-full bg-accent-soft px-2.5 py-0.5 text-[12px] font-semibold text-accent">{memory.mood}</span>}
+            {memory.mood && <span className="rounded-full bg-accent-soft px-3 py-0.5 text-[13px] font-semibold text-accent">{memory.mood}</span>}
           </p>
         </div>
         {!memory.pending && (

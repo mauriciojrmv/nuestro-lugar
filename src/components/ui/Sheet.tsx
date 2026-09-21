@@ -150,8 +150,8 @@ export function SheetAction({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'h-10 rounded-full px-2 text-[17px] transition-opacity active:opacity-50 disabled:opacity-30',
-        strong ? 'font-semibold text-accent' : 'text-muted',
+        'h-11 rounded-full px-3 text-[17px] transition-opacity active:opacity-50 disabled:opacity-30',
+        strong ? 'font-semibold text-accent' : 'text-ink-2',
       )}
     >
       {children}

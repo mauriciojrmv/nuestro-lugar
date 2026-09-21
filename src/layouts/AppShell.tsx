@@ -50,7 +50,7 @@ export function AppShell() {
               end={to === '/'}
               className={({ isActive }) =>
                 cn(
-                  'flex h-11 items-center gap-3 rounded-[12px] px-3 text-[15px] font-medium transition-colors',
+                  'flex h-12 items-center gap-3 rounded-[12px] px-3 text-[16px] font-medium transition-colors',
                   isActive ? 'bg-surface text-ink' : 'text-muted hover:text-ink',
                 )
               }
@@ -85,7 +85,7 @@ export function AppShell() {
               exit={{ y: -40, opacity: 0 }}
               className="fixed inset-x-0 top-0 z-40 flex justify-center pt-[calc(env(safe-area-inset-top)+6px)] pointer-events-none"
             >
-              <span className="material flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[13px] font-medium text-muted ring-1 ring-hairline">
+              <span className="material flex items-center gap-2 rounded-full px-4 py-2 text-[14px] font-semibold text-ink ring-1 ring-hairline">
                 <WifiOff className="size-3.5" strokeWidth={2} />
                 Sin conexión
               </span>
@@ -98,7 +98,7 @@ export function AppShell() {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-          className="mx-auto w-full max-w-[1080px] px-4 pb-[calc(env(safe-area-inset-bottom)+112px)] sm:px-6 lg:px-10 lg:pt-4 lg:pb-16"
+          className="mx-auto w-full max-w-[1080px] px-4 pb-[calc(env(safe-area-inset-bottom)+168px)] sm:px-6 lg:px-10 lg:pt-4 lg:pb-16"
         >
           <Outlet />
         </motion.main>
@@ -114,9 +114,9 @@ export function AppShell() {
             transition={{ type: 'spring', stiffness: 420, damping: 28 }}
             onClick={() => compose()}
             aria-label="Añadir recuerdo"
-            className="fixed right-4 bottom-[calc(env(safe-area-inset-bottom)+76px)] z-30 grid size-14 place-items-center rounded-full bg-ink text-bg shadow-[0_10px_30px_rgb(0_0_0/0.25)] active:scale-90 lg:hidden"
+            className="fixed right-4 bottom-[calc(env(safe-area-inset-bottom)+84px)] z-30 grid size-[60px] place-items-center rounded-full bg-ink text-bg shadow-[0_10px_30px_rgb(0_0_0/0.3)] ring-1 ring-hairline active:scale-90 lg:hidden"
           >
-            <Plus className="size-6" strokeWidth={2.2} />
+            <Plus className="size-7" strokeWidth={2.2} />
           </motion.button>
         )}
       </AnimatePresence>
@@ -126,7 +126,7 @@ export function AppShell() {
         aria-label="Principal"
         className="material fixed inset-x-0 bottom-0 z-30 border-t border-hairline pb-safe lg:hidden"
       >
-        <div className="mx-auto grid h-[56px] max-w-[560px] grid-cols-4">
+        <div className="mx-auto grid h-[68px] max-w-[560px] grid-cols-4 px-2">
           {TABS.map(({ to, label, Icon }) => (
             <NavLink
               key={to}
@@ -134,14 +134,21 @@ export function AppShell() {
               end={to === '/'}
               className={({ isActive }) =>
                 cn(
-                  'flex flex-col items-center justify-center gap-[3px] text-[10.5px] font-medium tracking-[0.01em] transition-colors active:opacity-60',
+                  'flex flex-col items-center justify-center gap-1 text-[12px] font-semibold tracking-[0.005em] transition-colors active:opacity-60',
                   isActive ? 'text-accent' : 'text-muted',
                 )
               }
             >
               {({ isActive }) => (
                 <>
-                  <Icon active={isActive} />
+                  <span
+                    className={cn(
+                      'grid h-8 w-14 place-items-center rounded-full transition-colors duration-200',
+                      isActive && 'bg-accent/15',
+                    )}
+                  >
+                    <Icon active={isActive} />
+                  </span>
                   {label}
                 </>
               )}

@@ -95,7 +95,7 @@ export function LetterForm({ initialDate, onClose }: { initialDate?: ISODate; on
   return (
     <>
       <SheetHeader leading={<SheetAction onClick={onClose}>Cancelar</SheetAction>} title="Cartita" />
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-4">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pt-1 pb-4">
         {!partner ? (
           <p className="py-16 text-center text-[16px] text-pretty text-muted">
             Cuando tu persona se una, podrás escribirle cartitas.
@@ -119,7 +119,7 @@ export function LetterForm({ initialDate, onClose }: { initialDate?: ISODate; on
                 {shortName(me)}
               </p>
             </div>
-            <div className="mt-4 overflow-hidden rounded-[20px] bg-surface-2/55">
+            <div className="mt-4 overflow-hidden rounded-[20px] bg-fill">
               <DateRow value={date} onChange={setDate} icon={<CalendarDays strokeWidth={1.7} />} label="Fecha" />
             </div>
             {status.kind === 'error' && <p className="mt-3 px-1 text-[14px] text-rose">{status.message}</p>}

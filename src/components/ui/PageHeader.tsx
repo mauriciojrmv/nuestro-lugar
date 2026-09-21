@@ -24,13 +24,13 @@ export function PageHeader({ title, eyebrow, subtitle, back, trailing, className
 
   return (
     <header className={cn('pt-safe', className)}>
-      <div className="flex h-12 items-center justify-between gap-2 lg:h-10">
+      <div className="flex h-14 items-center justify-between gap-2 lg:h-12">
         {back ? (
           <button
             onClick={goBack}
-            className="-ml-2 flex h-10 items-center gap-0.5 rounded-full pr-3 pl-1 text-[17px] text-accent active:opacity-50"
+            className="-ml-2 flex h-11 items-center gap-0.5 rounded-full pr-3 pl-1 text-[17px] font-medium text-accent active:opacity-50"
           >
-            <ChevronLeft className="size-[26px]" strokeWidth={2} />
+            <ChevronLeft className="size-7" strokeWidth={2.2} />
             <span>Atrás</span>
           </button>
         ) : (

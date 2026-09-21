@@ -30,8 +30,8 @@ export function DayPage() {
         title={formatLong(date)}
         trailing={
           canAdd && (
-            <button onClick={() => compose({ date })} aria-label="Añadir a este día" className="grid size-10 place-items-center rounded-full text-accent active:opacity-50">
-              <Plus className="size-6" strokeWidth={2} />
+            <button onClick={() => compose({ date })} aria-label="Añadir a este día" className="-mr-2 grid size-11 place-items-center rounded-full text-accent active:opacity-50">
+              <Plus className="size-7" strokeWidth={2} />
             </button>
           )
         }

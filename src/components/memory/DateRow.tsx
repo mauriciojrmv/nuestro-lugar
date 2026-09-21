@@ -18,11 +18,11 @@ export function DateRow({ value, onChange, icon, label, max }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   return (
-    <label className="relative flex min-h-[52px] cursor-pointer items-center gap-3 px-4">
-      <span className="text-muted [&>svg]:size-[20px]">{icon}</span>
+    <label className="relative flex min-h-[56px] cursor-pointer items-center gap-3 px-4">
+      <span className="text-muted [&>svg]:size-[22px]">{icon}</span>
       <span className="flex-1 text-[17px]">{label}</span>
       <span className="text-[17px] font-medium text-accent">{formatRelativeDay(value)}</span>
-      <ChevronRight className="size-[18px] text-muted/60" strokeWidth={2.2} />
+      <ChevronRight className="size-5 text-muted" strokeWidth={2.2} />
       <input
         ref={inputRef}
         type="date"

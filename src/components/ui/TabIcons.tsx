@@ -7,12 +7,12 @@ interface Props {
 }
 
 const base = {
-  width: 26,
-  height: 26,
+  width: 28,
+  height: 28,
   viewBox: '0 0 24 24',
   fill: 'none',
   stroke: 'currentColor',
-  strokeWidth: 1.6,
+  strokeWidth: 1.7,
   strokeLinecap: 'round' as const,
   strokeLinejoin: 'round' as const,
   'aria-hidden': true,

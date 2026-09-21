@@ -17,7 +17,7 @@ const variants: Record<Variant, string> = {
   primary: 'bg-ink text-bg',
   secondary: 'bg-surface-2 text-ink',
   ghost: 'bg-transparent text-ink hover:bg-surface-2',
-  accent: 'bg-accent text-[#0B0B0D]',
+  accent: 'bg-accent-fill text-[#0B0B0D]',
   destructive: 'bg-surface-2 text-rose',
 }
 

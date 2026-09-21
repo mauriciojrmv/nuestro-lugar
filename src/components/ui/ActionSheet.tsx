@@ -28,7 +28,7 @@ export function ActionSheet({ open, onClose, title, message, actions }: Props) {
             {message && <p className="mt-1 text-[14px] text-pretty text-muted">{message}</p>}
           </div>
         )}
-        <div className="overflow-hidden rounded-[18px] bg-surface-2/60">
+        <div className="overflow-hidden rounded-[18px] bg-fill">
           {actions.map((a, i) => (
             <button
               key={a.label}
@@ -37,19 +37,19 @@ export function ActionSheet({ open, onClose, title, message, actions }: Props) {
                 a.onSelect()
               }}
               className={cn(
-                'flex h-[54px] w-full items-center gap-3 px-4 text-left text-[17px] transition-colors active:bg-surface-2',
+                'flex h-[58px] w-full items-center gap-3.5 px-4 text-left text-[17px] transition-colors active:bg-surface-2/80',
                 i > 0 && 'border-t border-hairline',
                 a.destructive ? 'text-rose' : 'text-ink',
               )}
             >
-              {a.icon && <span className="text-muted [&>svg]:size-[20px]">{a.icon}</span>}
+              {a.icon && <span className={cn('[&>svg]:size-[22px]', a.destructive ? 'text-rose' : 'text-ink-2')}>{a.icon}</span>}
               {a.label}
             </button>
           ))}
         </div>
         <button
           onClick={onClose}
-          className="mt-2.5 h-[54px] w-full rounded-[18px] bg-surface-2/60 text-[17px] font-semibold transition-colors active:bg-surface-2"
+          className="mt-2.5 h-[58px] w-full rounded-[18px] bg-fill text-[17px] font-semibold transition-colors active:bg-surface-2/80"
         >
           Cancelar
         </button>

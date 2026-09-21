@@ -181,12 +181,12 @@ export function PhotoViewer({ entries: initialEntries, startIndex, onClose }: Pr
             </div>
             <div className="absolute inset-x-0 bottom-0 px-5 pb-[calc(env(safe-area-inset-bottom)+18px)]">
               {memory.title && <p className="text-[17px] font-semibold text-balance">{memory.title}</p>}
-              <p className="mt-0.5 text-[14px] text-white/70">
+              <p className="mt-0.5 text-[15px] text-white/80">
                 {formatLong(memory.date)}
                 {entry.photo.createdBy && ` · Agregada por ${nameOf(entry.photo.createdBy)}`}
               </p>
               {entries.length > 1 && (
-                <p className="mt-1 text-[13px] text-white/50 tabular-nums">
+                <p className="mt-1 text-[14px] text-white/70 tabular-nums">
                   {index + 1} de {entries.length}
                 </p>
               )}
@@ -230,7 +230,7 @@ function ViewerButton({ label, onClick, children }: { label: string; onClick: ()
       aria-label={label}
       title={label}
       onClick={onClick}
-      className="grid size-11 place-items-center rounded-full bg-white/10 backdrop-blur-xl transition-transform active:scale-90"
+      className="grid size-11 place-items-center rounded-full bg-black/45 ring-1 ring-white/20 backdrop-blur-xl transition-transform active:scale-90"
     >
       {children}
     </button>

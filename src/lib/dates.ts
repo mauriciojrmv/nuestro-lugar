@@ -74,6 +74,11 @@ export function formatShort(iso: ISODate): string {
   return `${d.getDate()} ${MONTHS[d.getMonth()].slice(0, 3).toUpperCase()} ${d.getFullYear()}`
 }
 
+/** "11 sept 2026" */
+export function formatMedium(iso: ISODate): string {
+  return parseISODate(iso).toLocaleDateString(LOCALE, { day: 'numeric', month: 'short', year: 'numeric' }).replace(/\./g, '')
+}
+
 /** "Septiembre 2026" */
 export function formatMonthYear(year: number, month: number): string {
   return `${capitalize(MONTHS[month])} ${year}`

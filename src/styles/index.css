@@ -13,11 +13,13 @@
   --elevated: #ffffff;
   --ink: #0b0b0d;
   --ink-2: #3a3a3f;
-  --muted: #86868b;
-  --hairline: rgb(11 11 13 / 0.08);
-  --accent: #b08d6b; /* #D6BFA5 darkened for contrast on light */
+  --muted: #6b6b70; /* 5:1 on the light background */
+  --hairline: rgb(11 11 13 / 0.1);
+  --accent: #86653f; /* #D6BFA5 deepened until text reaches 5:1 on light */
+  --accent-fill: #d6bfa5; /* the brand tone itself, for filled chips and pills */
   --accent-soft: #efe4d8;
-  --rose: #c48b8f;
+  --rose: #a4505a;
+  --fill: #efeff2; /* grouped rows inside sheets */
   --scrim: rgb(0 0 0 / 0.28);
   --tabbar: rgb(245 245 247 / 0.78);
   --paper: #fbf8f4;
@@ -28,14 +30,16 @@
   --bg: #0b0b0d;
   --surface: #151518;
   --surface-2: #1f1f23;
-  --elevated: #1a1a1d;
+  --elevated: #1c1c1f;
   --ink: #f5f5f7;
   --ink-2: #d1d1d6;
   --muted: #a1a1a6;
-  --hairline: rgb(255 255 255 / 0.08);
+  --hairline: rgb(255 255 255 / 0.11);
   --accent: #d6bfa5;
-  --accent-soft: #2a241e;
-  --rose: #d4a5a8;
+  --accent-fill: #d6bfa5;
+  --accent-soft: #2e271f;
+  --rose: #e0aeb1;
+  --fill: #2a2a2f; /* grouped rows inside sheets: clearly lifted from the sheet */
   --scrim: rgb(0 0 0 / 0.55);
   --tabbar: rgb(11 11 13 / 0.72);
   --paper: #18171a;
@@ -52,6 +56,8 @@
   --color-muted: var(--muted);
   --color-hairline: var(--hairline);
   --color-accent: var(--accent);
+  --color-accent-fill: var(--accent-fill);
+  --color-fill: var(--fill);
   --color-accent-soft: var(--accent-soft);
   --color-rose: var(--rose);
   --color-paper: var(--paper);
@@ -167,7 +173,7 @@
     backdrop-filter: saturate(180%) blur(20px);
   }
   .eyebrow {
-    @apply text-[12px] font-semibold tracking-[0.08em] uppercase text-muted;
+    @apply text-[13px] font-semibold tracking-[0.07em] uppercase text-muted;
   }
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
