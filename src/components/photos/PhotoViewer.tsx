@@ -7,6 +7,7 @@ import { cn } from '@/lib/cn'
 import { formatLong } from '@/lib/dates'
 import { humanizeError } from '@/lib/errors'
 import { useSignedUrl } from '@/hooks/useSignedUrl'
+import { usePinchZoom } from '@/hooks/usePinchZoom'
 import { useArchive, useDeletePhoto, useToggleFavorite } from '@/hooks/useArchive'
 import { useAuth } from '@/providers/AuthProvider'
 import { useCouple } from '@/providers/CoupleProvider'
@@ -42,6 +43,9 @@ export function PhotoViewer({ entries: initialEntries, startIndex, onClose }: Pr
   const [chrome, setChrome] = useState(true)
   const [menu, setMenu] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  // While a photo is zoomed, swipes pan it instead of changing photo.
+  const [zoomed, setZoomed] = useState(false)
+  const toggleChrome = useCallback(() => setChrome((c) => !c), [])
 
   const entry = entries[Math.min(index, entries.length - 1)]
   const memory = entry ? (byId.get(entry.memory.id) ?? entry.memory) : null
@@ -53,6 +57,7 @@ export function PhotoViewer({ entries: initialEntries, startIndex, onClose }: Pr
         const next = i + dir
         return next < 0 || next >= entries.length ? [i, 0] : [next, dir]
       })
+      setZoomed(false)
     },
     [entries.length],
   )
@@ -84,6 +89,7 @@ export function PhotoViewer({ entries: initialEntries, startIndex, onClose }: Pr
   if (!entry || !memory) return null
 
   const onDragEnd = (_: unknown, info: PanInfo) => {
+    if (zoomed) return
     const { offset, velocity } = info
     if (Math.abs(offset.x) > Math.abs(offset.y)) {
       if (offset.x < -70 || velocity.x < -500) paginate(1)
@@ -138,15 +144,14 @@ export function PhotoViewer({ entries: initialEntries, startIndex, onClose }: Pr
           animate="center"
           exit="exit"
           transition={{ x: { type: 'spring', stiffness: 320, damping: 34 }, opacity: { duration: 0.2 }, scale: { duration: 0.35, ease: [0.32, 0.72, 0, 1] } }}
-          drag
+          drag={!zoomed}
           dragDirectionLock
           dragSnapToOrigin
           dragElastic={0.5}
           onDragEnd={onDragEnd}
-          onTap={() => setChrome((c) => !c)}
           className="absolute inset-0 flex touch-none items-center justify-center"
         >
-          <ViewerImage entry={entry} />
+          <ViewerImage entry={entry} onZoomChange={setZoomed} onSingleTap={toggleChrome} />
         </motion.div>
       </AnimatePresence>
 
@@ -232,28 +237,39 @@ function ViewerButton({ label, onClick, children }: { label: string; onClick: ()
   )
 }
 
-/** Thumbnail first (already cached), then the full image fades in exactly over it. */
-function ViewerImage({ entry }: { entry: PhotoEntry }) {
+/** Thumbnail first (already cached), then the full image fades in exactly over it. Pinch or double-tap to zoom. */
+function ViewerImage({
+  entry,
+  onZoomChange,
+  onSingleTap,
+}: {
+  entry: PhotoEntry
+  onZoomChange: (zoomed: boolean) => void
+  onSingleTap: () => void
+}) {
   const { photo } = entry
   const thumb = useSignedUrl(photo.thumbPath)
   const main = useSignedUrl(photo.storagePath)
   const [loaded, setLoaded] = useState(false)
+  const { boxRef, style, handlers } = usePinchZoom(onZoomChange, onSingleTap)
 
   return (
-    <div className="relative size-full">
-      {thumb.url && !loaded && (
-        <img src={thumb.url} alt="" crossOrigin="anonymous" draggable={false} className="absolute inset-0 size-full object-contain" />
-      )}
-      {main.url && (
-        <img
-          src={main.url}
-          alt={entry.memory.title ?? ''}
-          crossOrigin="anonymous"
-          draggable={false}
-          onLoad={() => setLoaded(true)}
-          className={cn('absolute inset-0 size-full object-contain transition-opacity duration-300', loaded ? 'opacity-100' : 'opacity-0')}
-        />
-      )}
+    <div ref={boxRef} className="relative size-full touch-none" {...handlers}>
+      <div className="absolute inset-0 will-change-transform" style={style}>
+        {thumb.url && !loaded && (
+          <img src={thumb.url} alt="" crossOrigin="anonymous" draggable={false} className="absolute inset-0 size-full object-contain" />
+        )}
+        {main.url && (
+          <img
+            src={main.url}
+            alt={entry.memory.title ?? ''}
+            crossOrigin="anonymous"
+            draggable={false}
+            onLoad={() => setLoaded(true)}
+            className={cn('absolute inset-0 size-full object-contain transition-opacity duration-300', loaded ? 'opacity-100' : 'opacity-0')}
+          />
+        )}
+      </div>
     </div>
   )
 }

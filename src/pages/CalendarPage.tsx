@@ -60,27 +60,27 @@ export function CalendarPage() {
   return (
     <div className="lg:grid lg:grid-cols-[minmax(0,620px)_minmax(280px,340px)] lg:gap-14">
       <section>
-        <header className="flex items-end justify-between pt-safe pb-5">
-          <div className="pt-12 lg:pt-8">
-            <h1 className="text-[clamp(26px,8.4vw,34px)] leading-none font-bold tracking-[-0.03em] whitespace-nowrap">
+        <header className="pt-safe pb-5">
+          <div className="flex items-center justify-between gap-2 pt-12 lg:pt-8">
+            <h1 className="min-w-0 truncate text-[clamp(26px,8.4vw,34px)] leading-none font-bold tracking-[-0.03em]">
               {capitalize(monthName(month - 1))} <span className="text-muted">{year}</span>
             </h1>
-            <p className="mt-2 h-5 text-[14px] text-muted">
-              {monthCount > 0 ? `${monthCount} ${monthCount === 1 ? 'recuerdo' : 'recuerdos'}` : ''}
-            </p>
+            <div className="-mr-2 flex shrink-0 items-center">
+              <IconButton label="Mes anterior" onClick={() => go(-1)}>
+                <ChevronLeft className="size-6" strokeWidth={2} />
+              </IconButton>
+              <IconButton label="Mes siguiente" onClick={() => go(1)}>
+                <ChevronRight className="size-6" strokeWidth={2} />
+              </IconButton>
+            </div>
           </div>
-          <div className="flex items-center gap-0.5 pb-5">
+          <div className="mt-2 flex h-6 items-center gap-3 text-[14px] text-muted">
+            {monthCount > 0 && <span>{`${monthCount} ${monthCount === 1 ? 'recuerdo' : 'recuerdos'}`}</span>}
             {monthKey !== today.slice(0, 7) && (
-              <button onClick={goToday} className="mr-1 h-9 rounded-full px-3 text-[15px] font-semibold text-accent active:opacity-50">
-                Hoy
+              <button onClick={goToday} className="font-semibold text-accent active:opacity-50">
+                Volver a hoy
               </button>
             )}
-            <IconButton label="Mes anterior" onClick={() => go(-1)}>
-              <ChevronLeft className="size-6" strokeWidth={2} />
-            </IconButton>
-            <IconButton label="Mes siguiente" onClick={() => go(1)}>
-              <ChevronRight className="size-6" strokeWidth={2} />
-            </IconButton>
           </div>
         </header>
 
