@@ -1,6 +1,6 @@
 import { Zip, ZipDeflate, ZipPassThrough, strToU8 } from 'fflate'
 import { capitalize, monthName, parseISODate, todayISO } from '@/lib/dates'
-import type { Letter, Memory, Profile } from '@/types/domain'
+import type { Letter, Memory, Profile, Reply } from '@/types/domain'
 import { safeFileName, saveBlob } from '@/utils/download'
 import { photoStorage } from './storage'
 
@@ -61,7 +61,7 @@ const nameOf = (profiles: Profile[], id: string | null) => {
 
 const ext = (path: string) => path.split('.').pop() ?? 'jpg'
 
-function memoryJson(m: Memory, profiles: Profile[], files: string[], letters: Letter[]) {
+function memoryJson(m: Memory, profiles: Profile[], files: string[], letters: Letter[], replies: Reply[]) {
   return {
     id: m.id,
     fecha: m.date,
@@ -84,6 +84,9 @@ function memoryJson(m: Memory, profiles: Profile[], files: string[], letters: Le
       agregada_el: p.createdAt,
     })),
     cartitas: letters.filter((l) => l.memoryId === m.id).map((l) => l.id),
+    respuestas: replies
+      .filter((r) => r.memoryId === m.id)
+      .map((r) => ({ de: nameOf(profiles, r.authorId), texto: r.body, fecha: r.createdAt })),
   }
 }
 
@@ -109,7 +112,14 @@ Guarda esta copia en un lugar seguro.
 `
 
 export async function exportArchive(
-  options: { memories: Memory[]; letters: Letter[]; profiles: Profile[]; filename?: string; includeLetters?: boolean },
+  options: {
+    memories: Memory[]
+    letters: Letter[]
+    profiles: Profile[]
+    replies?: Reply[]
+    filename?: string
+    includeLetters?: boolean
+  },
   onProgress: (p: ExportProgress) => void,
   signal?: AbortSignal,
 ) {
@@ -164,7 +174,7 @@ export async function exportArchive(
         onProgress({ done: ++processed, total })
       }
 
-      const json = memoryJson(memory, profiles, files, letters)
+      const json = memoryJson(memory, profiles, files, letters, options.replies ?? [])
       summary.push({ ...json, carpeta: folder.slice(root.length + 1) })
       addFile(`${folder}/recuerdo.json`, strToU8(JSON.stringify(json, null, 2)), true)
     }

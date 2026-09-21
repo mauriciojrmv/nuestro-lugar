@@ -58,10 +58,12 @@ export function useRealtimeSync() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'favorites', filter }, () => invalidate(qk.memories(coupleId)))
       .on('postgres_changes', { event: '*', schema: 'public', table: 'letters', filter }, () => invalidate(qk.letters(coupleId)))
       .on('postgres_changes', { event: '*', schema: 'public', table: 'notes', filter }, () => invalidate(qk.notes(coupleId)))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'memory_comments', filter }, () => invalidate(qk.replies(coupleId)))
       .on('postgres_changes', { event: '*', schema: 'public', table: 'activity', filter }, (payload) => {
         invalidate(qk.activity(coupleId))
         // Deletions aren't filterable in Realtime; "seen" shows up here instead.
         invalidate(qk.notes(coupleId))
+        invalidate(qk.replies(coupleId))
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') notice(payload.new as ActivityRow)
       })
       .subscribe((status) => {

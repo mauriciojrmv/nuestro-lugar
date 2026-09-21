@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { Bell, Calendar, Camera, Download, Home, LogOut, Moon, Shield, User, UserRound, Users } from 'lucide-react'
+import { Bell, BellRing, Calendar, Camera, Download, Home, LogOut, Moon, Shield, User, UserRound, Users } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { formatMedium } from '@/lib/dates'
 import { humanizeError } from '@/lib/errors'
@@ -21,6 +21,7 @@ import { Spinner } from '@/components/ui/Spinner'
 import { InviteCode } from '@/components/couple/InviteCode'
 import { shortName } from '@/utils/names'
 import { useStorageUsage } from '@/hooks/useStorageUsage'
+import { usePush } from '@/hooks/usePush'
 import { formatBytes } from '@/services/usage'
 import { ProgressBar } from '@/components/ui/Feedback'
 
@@ -37,6 +38,7 @@ export function SettingsPage() {
   const [avatarBusy, setAvatarBusy] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const usage = useStorageUsage()
+  const push = usePush()
 
   const refreshCouple = () => client.invalidateQueries({ queryKey: qk.couple(user?.id) })
 
@@ -148,7 +150,34 @@ export function SettingsPage() {
         )}
       </ListGroup>
 
-      <ListGroup title="Preferencias" footer="Los avisos aparecen dentro de la app cuando tu pareja agrega algo.">
+      <ListGroup
+        title="Notificaciones"
+        footer={
+          push.support === 'needs-install'
+            ? 'En iPhone, primero añade la app a la pantalla de inicio (Compartir → Añadir a pantalla de inicio) y ábrela desde ahí.'
+            : push.support === 'unsupported'
+              ? 'Este navegador no permite notificaciones. Instala la app en tu móvil para recibirlas.'
+              : push.permission === 'denied'
+                ? 'Las notificaciones están bloqueadas. Actívalas en los ajustes del móvil para esta app.'
+                : 'Te avisamos aunque la app esté cerrada. Nunca mostramos el texto de notitas, cartas ni respuestas.'
+        }
+      >
+        <ListRow
+          icon={<BellRing />}
+          label="En este móvil"
+          trailing={
+            <Toggle
+              checked={push.enabled}
+              onChange={(on) => void push.setOn(on)}
+              label="Notificaciones en este móvil"
+              disabled={push.support !== 'ok' || push.busy}
+            />
+          }
+        />
+        <ListRow icon={<Bell />} label="Dentro de la app" trailing={<Toggle checked={liveNotices} onChange={setLiveNotices} label="Avisos dentro de la app" />} />
+      </ListGroup>
+
+      <ListGroup title="Preferencias">
         <div className="flex min-h-[58px] items-center gap-3 px-4">
           <span className="grid size-[34px] shrink-0 place-items-center rounded-[10px] bg-accent-soft text-accent">
             <Moon className="size-5" />
@@ -164,7 +193,6 @@ export function SettingsPage() {
             ]}
           />
         </div>
-        <ListRow icon={<Bell />} label="Avisos" trailing={<Toggle checked={liveNotices} onChange={setLiveNotices} label="Avisos" />} />
       </ListGroup>
 
       <ListGroup

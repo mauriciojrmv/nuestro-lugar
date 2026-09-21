@@ -9,7 +9,7 @@ import { useComposer } from '@/providers/ComposerProvider'
 import { useCouple } from '@/providers/CoupleProvider'
 import { useOnline } from '@/hooks/useOnline'
 import { useRealtimeSync } from '@/hooks/useRealtimeSync'
-import { useNotes } from '@/hooks/useArchive'
+import { FloatingNotes } from '@/components/notes/FloatingNotes'
 
 interface Tab {
   to: string
@@ -34,9 +34,6 @@ export function AppShell() {
   const compose = useComposer()
   const { me, partner } = useCouple()
   const showFab = FAB_ROUTES.includes(location.pathname)
-  // A note waiting on Home: a small dot on the Inicio tab from anywhere else.
-  const { data: notes } = useNotes()
-  const noteWaiting = Boolean(me && notes?.some((n) => n.recipientId === me.id)) && location.pathname !== '/'
 
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[248px_1fr]">
@@ -152,9 +149,6 @@ export function AppShell() {
                     )}
                   >
                     <Icon active={isActive} />
-                    {to === '/' && noteWaiting && (
-                      <span className="absolute top-0 right-2.5 size-2.5 rounded-full bg-rose ring-2 ring-bg" aria-label="Tienes una notita" />
-                    )}
                   </span>
                   {label}
                 </>
@@ -164,6 +158,7 @@ export function AppShell() {
         </div>
       </nav>
 
+      <FloatingNotes />
       <ScrollRestoration />
     </div>
   )

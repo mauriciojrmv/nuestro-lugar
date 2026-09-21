@@ -10,6 +10,8 @@ Webapp privada para dos personas: el archivo de una relación. Fotografías, rec
 - **Historia**: la línea de tiempo, que crece sola.
 - **Momentos**: los recuerdos marcados con ♡.
 - **Cartitas**: cartas privadas entre los dos (no es un chat).
+- **Respuestas y «me encanta»**: el ♡ de cada recuerdo se ve para la otra persona («A Favi le encanta») y debajo hay una conversación privada.
+- **Notificaciones push**: avisos en el móvil aunque la app esté cerrada (en iPhone, con la app instalada en la pantalla de inicio). Nunca incluyen el texto de notitas, cartas ni respuestas.
 - **Notitas**: mensajitos cortos que flotan en Inicio para tu pareja. Se ven una sola vez: al cerrarlos se borran (del servidor también) y solo queda el aviso «Favi vio tu notita».
 - **Exportar**: un ZIP con todo, por año/mes/día, con un `recuerdo.json` por recuerdo.
 
@@ -73,6 +75,7 @@ Tienes dos opciones:
 3. `supabase/migrations/20260921000003_storage_realtime.sql`: bucket privado, políticas de Storage y Realtime
 4. `supabase/migrations/20260922000001_notes.sql`: notitas (se leen una vez)
 5. `supabase/migrations/20260922000002_videos_limits.sql`: videos, un solo espacio por instalación y medidor de almacenamiento
+6. `supabase/migrations/20260922000003_replies_push.sql`: respuestas y notificaciones push
 
 **B · Supabase CLI.**
 
@@ -198,6 +201,22 @@ La app solo habla con la interfaz `PhotoStorage` (`src/services/storage/types.ts
 1. Crea `src/services/storage/r2Storage.ts` implementando la interfaz. Las URLs firmadas de R2 deben emitirse desde un Worker o una Edge Function que verifique el JWT de Supabase y la pertenencia a la pareja, **nunca** con credenciales en el frontend.
 2. Cambia una línea en `src/services/storage/provider.ts`.
 3. Copia los objetos conservando las mismas rutas. `memory_photos.storage_path` no cambia.
+
+## Notificaciones push
+
+La base de datos avisa a la Edge Function `push` (con `pg_net`) cada vez que hay actividad nueva; la función envía la notificación cifrada al móvil de la pareja con Web Push (VAPID).
+
+1. Genera claves VAPID: `npx web-push generate-vapid-keys`.
+2. Secretos de la función (Project Settings → Edge Functions → Secrets): `PUSH_SECRET` (una cadena aleatoria larga), `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` y `APP_URL` (la URL de la app).
+3. Despliega: `npx supabase functions deploy push --no-verify-jwt`.
+4. En el SQL Editor, la configuración privada (no se expone por la API):
+   ```sql
+   insert into private.push_config (id, url, secret)
+   values (1, 'https://<project-ref>.supabase.co/functions/v1/push', '<PUSH_SECRET>');
+   ```
+5. En GitHub añade el secreto `VITE_VAPID_PUBLIC_KEY` (la clave pública).
+
+Luego cada persona las activa en **Configuración → Notificaciones**. En iPhone solo funcionan con la app añadida a la pantalla de inicio (iOS 16.4 o posterior).
 
 ## Almacenamiento y límites
 

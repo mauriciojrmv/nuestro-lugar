@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { Archive, FileJson, Folder, Mail } from 'lucide-react'
 import { humanizeError } from '@/lib/errors'
-import { useArchive, useLetters } from '@/hooks/useArchive'
+import { useArchive, useLetters, useReplies } from '@/hooks/useArchive'
 import { useCouple } from '@/providers/CoupleProvider'
 import { exportArchive, type ExportProgress } from '@/services/export'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -15,6 +15,7 @@ export function ExportPage() {
   const { memories, photos } = useArchive()
   const { data: letters } = useLetters()
   const { members } = useCouple()
+  const { byMemory } = useReplies()
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
   const abortRef = useRef<AbortController | null>(null)
 
@@ -24,7 +25,7 @@ export function ExportPage() {
     setStatus({ kind: 'working', progress: { done: 0, total: photos.length } })
     try {
       await exportArchive(
-        { memories, letters: letters ?? [], profiles: members },
+        { memories, letters: letters ?? [], profiles: members, replies: [...byMemory.values()].flat() },
         (progress) => setStatus({ kind: 'working', progress }),
         controller.signal,
       )

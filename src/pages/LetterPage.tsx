@@ -14,6 +14,8 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { IconButton } from '@/components/ui/IconButton'
 import { ConfirmSheet } from '@/components/ui/ActionSheet'
 import { EmptyState } from '@/components/ui/Feedback'
+import { Button } from '@/components/ui/Button'
+import { useComposer } from '@/providers/ComposerProvider'
 
 export function LetterPage() {
   const { id = '' } = useParams()
@@ -24,6 +26,7 @@ export function LetterPage() {
   const toast = useToast()
   const navigate = useNavigate()
   const [confirm, setConfirm] = useState(false)
+  const compose = useComposer()
   const letter = letters?.find((l) => l.id === id)
 
   // Opening it is reading it.
@@ -71,6 +74,11 @@ export function LetterPage() {
         </article>
       ) : (
         !isPending && <EmptyState title="Esta cartita ya no está aquí." />
+      )}
+      {letter && letter.recipientId === user?.id && (
+        <Button variant="secondary" size="lg" block className="mt-6" onClick={() => compose({ mode: 'letter' })}>
+          Responder con una cartita
+        </Button>
       )}
       <ConfirmSheet
         open={confirm}

@@ -8,9 +8,10 @@ import { fetchActivity } from '@/services/activity'
 import { setFavorite } from '@/services/favorites'
 import { deletePhoto } from '@/services/photos'
 import { fetchNotes, removeNote } from '@/services/notes'
+import { addReply, deleteReply, fetchReplies } from '@/services/replies'
 import { useAuth } from '@/providers/AuthProvider'
 import { useCouple } from '@/providers/CoupleProvider'
-import type { Memory, Note, Photo, PhotoEntry } from '@/types/domain'
+import type { Memory, Note, Photo, PhotoEntry, Reply } from '@/types/domain'
 
 export function coverOf(memory: Memory): Photo | undefined {
   return memory.photos.find((p) => p.id === memory.coverPhotoId) ?? memory.photos[0]
@@ -158,5 +159,64 @@ export function useRemoveNote() {
       void client.invalidateQueries({ queryKey: key })
       void client.invalidateQueries({ queryKey: qk.activity(couple?.id) })
     },
+  })
+}
+
+/** Every reply in the space, grouped by memory. */
+export function useReplies() {
+  const { couple } = useCouple()
+  const query = useQuery({
+    queryKey: qk.replies(couple?.id),
+    queryFn: () => fetchReplies(couple!.id),
+    enabled: Boolean(couple),
+  })
+  const byMemory = useMemo(() => {
+    const map = new Map<string, Reply[]>()
+    for (const r of query.data ?? []) map.set(r.memoryId, [...(map.get(r.memoryId) ?? []), r])
+    return map
+  }, [query.data])
+  return { byMemory, isLoading: query.isPending }
+}
+
+/** Replies show up instantly and are confirmed in the background. */
+export function useSendReply() {
+  const client = useQueryClient()
+  const { user } = useAuth()
+  const { couple } = useCouple()
+  const key = qk.replies(couple?.id)
+  return useMutation({
+    mutationFn: (r: { id: string; memoryId: string; body: string }) =>
+      addReply({ ...r, coupleId: couple!.id, authorId: user!.id }),
+    onMutate: async (r) => {
+      await client.cancelQueries({ queryKey: key })
+      const previous = client.getQueryData<Reply[]>(key)
+      client.setQueryData<Reply[]>(key, (list) => [
+        ...(list ?? []),
+        { id: r.id, memoryId: r.memoryId, authorId: user!.id, body: r.body.trim(), createdAt: new Date().toISOString(), pending: true },
+      ])
+      return { previous }
+    },
+    onError: (_e, _r, ctx) => ctx?.previous && client.setQueryData(key, ctx.previous),
+    onSettled: () => {
+      void client.invalidateQueries({ queryKey: key })
+      void client.invalidateQueries({ queryKey: qk.activity(couple?.id) })
+    },
+  })
+}
+
+export function useDeleteReply() {
+  const client = useQueryClient()
+  const { couple } = useCouple()
+  const key = qk.replies(couple?.id)
+  return useMutation({
+    mutationFn: (reply: Reply) => deleteReply(reply.id),
+    onMutate: async (reply) => {
+      await client.cancelQueries({ queryKey: key })
+      const previous = client.getQueryData<Reply[]>(key)
+      client.setQueryData<Reply[]>(key, (list) => list?.filter((r) => r.id !== reply.id))
+      return { previous }
+    },
+    onError: (_e, _r, ctx) => ctx?.previous && client.setQueryData(key, ctx.previous),
+    onSettled: () => void client.invalidateQueries({ queryKey: key }),
   })
 }

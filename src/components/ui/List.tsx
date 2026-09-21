@@ -57,17 +57,29 @@ export function ListRow({ icon, label, detail, to, onClick, destructive, chevron
 }
 
 /** iOS switch. */
-export function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
+export function Toggle({
+  checked,
+  onChange,
+  label,
+  disabled,
+}: {
+  checked: boolean
+  onChange: (v: boolean) => void
+  label: string
+  disabled?: boolean
+}) {
   return (
     <button
       role="switch"
       aria-checked={checked}
       aria-label={label}
+      disabled={disabled}
       onClick={() => onChange(!checked)}
       className={cn(
         // The visual switch is iOS-sized; the touch area extends to 44px+.
         'relative h-[31px] w-[51px] shrink-0 rounded-full transition-colors duration-200 after:absolute after:-inset-2',
         checked ? 'bg-accent' : 'bg-surface-2 ring-1 ring-hairline',
+        disabled && 'opacity-40',
       )}
     >
       <span

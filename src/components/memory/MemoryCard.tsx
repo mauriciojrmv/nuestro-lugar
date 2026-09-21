@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import { CloudOff } from 'lucide-react'
+import { CloudOff, Heart, MessageCircle } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { formatDayMonth } from '@/lib/dates'
 import { coverOf } from '@/hooks/useArchive'
@@ -8,10 +8,13 @@ import { SignedImage } from '@/components/ui/SignedImage'
 import type { Memory } from '@/types/domain'
 import { VideoBadge } from '@/components/photos/VideoBadge'
 import { mediaLabelOf } from '@/utils/media'
+import { useReplies } from '@/hooks/useArchive'
 
 /** Large, photo-first card. Text memories get a quiet typographic card instead. */
 export function MemoryCard({ memory, eyebrow, className }: { memory: Memory; eyebrow?: string; className?: string }) {
-  const { nameOf } = useCouple()
+  const { nameOf, partner } = useCouple()
+  const replies = useReplies().byMemory.get(memory.id)?.length ?? 0
+  const partnerLoves = Boolean(partner && memory.favoritedBy.includes(partner.id))
   const cover = coverOf(memory)
   const author = nameOf(memory.createdBy)
 
@@ -52,6 +55,16 @@ export function MemoryCard({ memory, eyebrow, className }: { memory: Memory; eye
           {formatDayMonth(memory.date)}
           {author && <span>· Agregado por {author}</span>}
           {memory.pending && <CloudOff className="size-3.5" aria-label="Pendiente de sincronizar" />}
+          {partnerLoves && (
+            <span className="inline-flex items-center gap-1 text-rose" aria-label={`A ${nameOf(partner!.id)} le encanta`}>
+              · <Heart className="size-3.5 fill-current" strokeWidth={0} />
+            </span>
+          )}
+          {replies > 0 && (
+            <span className="inline-flex items-center gap-1" aria-label={`${replies} respuestas`}>
+              · <MessageCircle className="size-3.5" strokeWidth={2} /> {replies}
+            </span>
+          )}
         </p>
       </div>
     </Link>

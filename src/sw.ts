@@ -44,3 +44,49 @@ registerRoute(
     ],
   }),
 )
+
+// ---------------------------------------------------------------------------
+// Push notifications: "Favi guardó un recuerdo con 3 fotos."
+// ---------------------------------------------------------------------------
+interface PushPayload {
+  title?: string
+  body?: string
+  url?: string
+  tag?: string
+}
+
+self.addEventListener('push', (event) => {
+  let data: PushPayload = {}
+  try {
+    data = event.data?.json() ?? {}
+  } catch {
+    data = { body: event.data?.text() }
+  }
+  const scope = self.registration.scope
+  event.waitUntil(
+    self.registration.showNotification(data.title ?? 'Nuestro Lugar', {
+      body: data.body ?? '',
+      icon: `${scope}pwa-192.png`,
+      badge: `${scope}pwa-192.png`,
+      tag: data.tag,
+      data: { url: scope + (data.url ?? '') },
+    }),
+  )
+})
+
+// Tapping a notification opens (or focuses) the app on the right screen.
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  const url: string = event.notification.data?.url ?? self.registration.scope
+  event.waitUntil(
+    (async () => {
+      const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      const existing = windows.find((w) => w.url.startsWith(self.registration.scope))
+      if (existing) {
+        await existing.focus()
+        return existing.navigate(url)
+      }
+      return self.clients.openWindow(url)
+    })(),
+  )
+})

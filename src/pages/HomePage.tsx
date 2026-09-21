@@ -9,8 +9,11 @@ import { Button } from '@/components/ui/Button'
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/Feedback'
 import { MemoryCard } from '@/components/memory/MemoryCard'
 import { InviteCode } from '@/components/couple/InviteCode'
-import { FloatingNotes } from '@/components/notes/FloatingNotes'
+import { NotesWaiting } from '@/components/notes/FloatingNotes'
 import { useStorageUsage } from '@/hooks/useStorageUsage'
+import { usePush } from '@/hooks/usePush'
+import { usePreference } from '@/hooks/usePreference'
+import { BellRing } from 'lucide-react'
 import { formatBytes } from '@/services/usage'
 import { activityLine } from '@/utils/activityText'
 import { rediscover } from '@/utils/rediscover'
@@ -46,7 +49,9 @@ export function HomePage() {
         </div>
       </header>
 
-      <FloatingNotes />
+      <NotesWaiting />
+
+      {complete && <PushInvite partnerName={partner ? nameOf(partner.id) : ''} />}
 
       {usage.nearLimit && (
         <Link to="/ajustes" className="mb-10 block rounded-[20px] bg-rose/10 px-5 py-4 ring-1 ring-rose/25 active:opacity-70">
@@ -126,6 +131,32 @@ export function HomePage() {
         </div>
       )}
     </div>
+  )
+}
+
+/** Asked once, gently, only where notifications can actually work. */
+function PushInvite({ partnerName }: { partnerName: string }) {
+  const push = usePush()
+  const [dismissed, setDismissed] = usePreference('nl.pushInviteDismissed', false)
+  if (dismissed || !push.checked || push.support !== 'ok' || push.permission === 'denied' || push.enabled) return null
+  return (
+    <section className="mb-10 flex animate-rise items-start gap-4 rounded-[22px] bg-surface p-5">
+      <span className="grid size-11 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
+        <BellRing className="size-5" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="text-[17px] font-semibold tracking-[-0.01em]">¿Te avisamos cuando {partnerName} agregue algo?</p>
+        <p className="mt-1 text-[15px] text-muted">Aunque la app esté cerrada.</p>
+        <div className="mt-4 flex gap-2">
+          <Button onClick={() => void push.setOn(true)} loading={push.busy}>
+            Activar
+          </Button>
+          <Button variant="ghost" onClick={() => setDismissed(true)}>
+            Ahora no
+          </Button>
+        </div>
+      </div>
+    </section>
   )
 }
 

@@ -5,4 +5,5 @@ export const qk = {
   activity: (coupleId: string | undefined) => ['activity', coupleId] as const,
   notes: (coupleId: string | undefined) => ['notes', coupleId] as const,
   usage: (coupleId: string | undefined) => ['usage', coupleId] as const,
+  replies: (coupleId: string | undefined) => ['replies', coupleId] as const,
 }

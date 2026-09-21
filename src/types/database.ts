@@ -80,6 +80,15 @@ export interface LetterRow {
   updated_at: string
 }
 
+export interface CommentRow {
+  id: string
+  couple_id: string
+  memory_id: string
+  author_id: string
+  body: string
+  created_at: string
+}
+
 export interface NoteRow {
   id: string
   couple_id: string
@@ -93,7 +102,7 @@ export interface ActivityRow {
   id: number
   couple_id: string
   actor_id: string | null
-  kind: 'memory' | 'photos' | 'favorite' | 'letter' | 'note' | 'note_seen'
+  kind: 'memory' | 'photos' | 'favorite' | 'letter' | 'note' | 'note_seen' | 'comment'
   memory_id: string | null
   letter_id: string | null
   note_id: string | null

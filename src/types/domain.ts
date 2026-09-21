@@ -72,7 +72,17 @@ export interface Note {
   createdAt: string
 }
 
-export type ActivityKind = 'memory' | 'photos' | 'favorite' | 'letter' | 'note' | 'note_seen'
+/** A reply under a memory: a private conversation between the two. */
+export interface Reply {
+  id: string
+  memoryId: string
+  authorId: string
+  body: string
+  createdAt: string
+  pending?: boolean
+}
+
+export type ActivityKind = 'memory' | 'photos' | 'favorite' | 'letter' | 'note' | 'note_seen' | 'comment'
 
 export interface Activity {
   id: number
