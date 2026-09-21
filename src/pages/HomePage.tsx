@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/Feedback'
 import { MemoryCard } from '@/components/memory/MemoryCard'
 import { InviteCode } from '@/components/couple/InviteCode'
+import { FloatingNotes } from '@/components/notes/FloatingNotes'
 import { activityLine } from '@/utils/activityText'
 import { rediscover } from '@/utils/rediscover'
 import type { Activity } from '@/types/domain'
@@ -41,6 +42,8 @@ export function HomePage() {
           )}
         </div>
       </header>
+
+      <FloatingNotes />
 
       {!complete && couple?.inviteCode && (
         <section className="mb-10 animate-rise rounded-[24px] bg-surface p-6">

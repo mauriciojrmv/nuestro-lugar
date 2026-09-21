@@ -10,6 +10,7 @@ Webapp privada para dos personas: el archivo de una relación. Fotografías, rec
 - **Historia**: la línea de tiempo, que crece sola.
 - **Momentos**: los recuerdos marcados con ♡.
 - **Cartitas**: cartas privadas entre los dos (no es un chat).
+- **Notitas**: mensajitos cortos que flotan en Inicio para tu pareja. Se ven una sola vez: al cerrarlos se borran (del servidor también) y solo queda el aviso «Favi vio tu notita».
 - **Exportar**: un ZIP con todo, por año/mes/día, con un `recuerdo.json` por recuerdo.
 
 El **recuerdo** (`memories`) es la entidad central. Fotos, favoritos y cartas cuelgan de él, y todas las vistas derivan de una sola consulta, así que nunca pueden contradecirse.
@@ -70,6 +71,7 @@ Tienes dos opciones:
 1. `supabase/migrations/20260921000001_schema.sql`: tablas, restricciones y triggers
 2. `supabase/migrations/20260921000002_security.sql`: RLS, funciones de pareja y actividad
 3. `supabase/migrations/20260921000003_storage_realtime.sql`: bucket privado, políticas de Storage y Realtime
+4. `supabase/migrations/20260922000001_notes.sql`: notitas (se leen una vez)
 
 **B · Supabase CLI.**
 

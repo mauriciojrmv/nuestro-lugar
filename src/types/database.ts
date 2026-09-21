@@ -78,13 +78,23 @@ export interface LetterRow {
   updated_at: string
 }
 
+export interface NoteRow {
+  id: string
+  couple_id: string
+  author_id: string
+  recipient_id: string
+  body: string
+  created_at: string
+}
+
 export interface ActivityRow {
   id: number
   couple_id: string
   actor_id: string | null
-  kind: 'memory' | 'photos' | 'favorite' | 'letter'
+  kind: 'memory' | 'photos' | 'favorite' | 'letter' | 'note' | 'note_seen'
   memory_id: string | null
   letter_id: string | null
+  note_id: string | null
   photo_count: number
   created_at: string
 }

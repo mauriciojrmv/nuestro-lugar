@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Images, Mail, PenLine } from 'lucide-react'
+import { Images, Mail, StickyNote } from 'lucide-react'
 import { Sheet } from '@/components/ui/Sheet'
 import { LetterForm } from '@/components/letters/LetterForm'
+import { NoteForm } from '@/components/notes/NoteForm'
 import { useSaveMemory } from '@/hooks/useSaveMemory'
 import { useCouple } from '@/providers/CoupleProvider'
 import { shortName } from '@/utils/names'
@@ -13,7 +14,7 @@ import type { Memory } from '@/types/domain'
 import { MemoryForm } from './MemoryForm'
 import { SaveStatus } from './SaveStatus'
 
-export type ComposerMode = 'choose' | 'memory' | 'letter'
+export type ComposerMode = 'choose' | 'memory' | 'letter' | 'note'
 
 export interface ComposerRequest {
   mode?: ComposerMode
@@ -44,7 +45,8 @@ export function ComposerSheet({ request, onClose }: Props) {
     request?.memory ? fieldsOf(request.memory) : emptyFields(request?.date ?? todayISO()),
   )
   const [photos, setPhotos] = useState<DraftPhoto[]>([])
-  const [focusText, setFocusText] = useState(request?.mode === 'memory')
+  // Opened straight into the form (e.g. from an empty day): start with the cursor in the text.
+  const focusText = request?.mode === 'memory'
   const fileRef = useRef<HTMLInputElement>(null)
   const { state, save, backToForm } = useSaveMemory()
   const { partner } = useCouple()
@@ -82,24 +84,27 @@ export function ComposerSheet({ request, onClose }: Props) {
   const pick = () => fileRef.current?.click()
 
   const choices: Array<{ key: string; icon: ReactNode; label: string; hint: string; onClick: () => void }> = [
-    // Both start the same memory (photos and/or words); only the first step differs.
-    { key: 'photos', icon: <Images />, label: 'Fotos', hint: 'Texto opcional', onClick: pick },
+    // A memory is kept forever (photos and/or words). The picker opens right away;
+    // closing it leaves the form ready to write without photos.
     {
-      key: 'note',
-      icon: <PenLine />,
-      label: 'Escribir',
-      hint: 'Fotos opcionales',
+      key: 'memory',
+      icon: <Images />,
+      label: 'Recuerdo',
+      hint: 'Para siempre',
       onClick: () => {
-        setFocusText(true)
         setMode('memory')
+        pick()
       },
     },
+    { key: 'note', icon: <StickyNote />, label: 'Notita', hint: 'Una sola vez', onClick: () => setMode('note') },
     { key: 'letter', icon: <Mail />, label: 'Carta', hint: partner ? `Para ${shortName(partner)}` : 'Una cartita', onClick: () => setMode('letter') },
   ]
 
   let content: ReactNode
   if (mode === 'letter') {
     content = <LetterForm initialDate={request?.date} onClose={onClose} />
+  } else if (mode === 'note') {
+    content = <NoteForm onClose={onClose} />
   } else if (state.status !== 'idle') {
     content = (
       <SaveStatus
@@ -125,7 +130,7 @@ export function ComposerSheet({ request, onClose }: Props) {
   } else {
     content = (
       <div className="px-5 pt-3 pb-5 sm:pt-7">
-        <h2 className="px-1 text-[26px] font-bold tracking-[-0.025em]">¿Qué quieres guardar?</h2>
+        <h2 className="px-1 text-[26px] font-bold tracking-[-0.025em]">¿Qué quieres compartir?</h2>
         <div className="mt-5 grid grid-cols-3 gap-2.5">
           {choices.map((c, i) => (
             <motion.button

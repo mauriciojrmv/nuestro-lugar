@@ -22,7 +22,13 @@ createRoot(document.getElementById('root')!).render(
       {isConfigured ? (
         <PersistQueryClientProvider
           client={queryClient}
-          persistOptions={{ persister: queryPersister, maxAge: PERSIST_MAX_AGE, buster: PERSIST_BUSTER }}
+          persistOptions={{
+            persister: queryPersister,
+            maxAge: PERSIST_MAX_AGE,
+            buster: PERSIST_BUSTER,
+            // Notitas are read once: they never touch the device's disk.
+            dehydrateOptions: { shouldDehydrateQuery: (q) => q.state.status === 'success' && q.queryKey[0] !== 'notes' },
+          }}
         >
           <ToastProvider>
             <AuthProvider>

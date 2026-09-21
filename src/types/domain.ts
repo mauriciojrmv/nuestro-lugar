@@ -60,7 +60,16 @@ export interface Letter {
   pending?: boolean
 }
 
-export type ActivityKind = 'memory' | 'photos' | 'favorite' | 'letter'
+/** A note read once: it is deleted as soon as the recipient closes it. */
+export interface Note {
+  id: string
+  authorId: string
+  recipientId: string
+  body: string
+  createdAt: string
+}
+
+export type ActivityKind = 'memory' | 'photos' | 'favorite' | 'letter' | 'note' | 'note_seen'
 
 export interface Activity {
   id: number

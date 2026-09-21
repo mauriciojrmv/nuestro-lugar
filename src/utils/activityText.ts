@@ -15,6 +15,10 @@ export function activityLine(a: Activity, actorName: string, isMe: boolean): str
       return isMe ? 'Marcaste un momento como favorito.' : `${actorName} marcó un momento como favorito.`
     case 'letter':
       return isMe ? 'Escribiste una cartita.' : `${actorName} te escribió una cartita.`
+    case 'note':
+      return isMe ? 'Dejaste una notita.' : `${actorName} te dejó una notita.`
+    case 'note_seen':
+      return isMe ? 'Viste una notita.' : `${actorName} vio tu notita.`
   }
 }
 
@@ -31,5 +35,9 @@ export function liveLine(a: Activity, actorName: string): string {
       return `${actorName} marcó un momento como favorito.`
     case 'letter':
       return `${actorName} te escribió una cartita.`
+    case 'note':
+      return `${actorName} te dejó una notita.`
+    case 'note_seen':
+      return `${actorName} vio tu notita.`
   }
 }

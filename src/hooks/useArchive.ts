@@ -7,9 +7,10 @@ import { fetchLetters } from '@/services/letters'
 import { fetchActivity } from '@/services/activity'
 import { setFavorite } from '@/services/favorites'
 import { deletePhoto } from '@/services/photos'
+import { fetchNotes, removeNote } from '@/services/notes'
 import { useAuth } from '@/providers/AuthProvider'
 import { useCouple } from '@/providers/CoupleProvider'
-import type { Memory, Photo, PhotoEntry } from '@/types/domain'
+import type { Memory, Note, Photo, PhotoEntry } from '@/types/domain'
 
 export function coverOf(memory: Memory): Photo | undefined {
   return memory.photos.find((p) => p.id === memory.coverPhotoId) ?? memory.photos[0]
@@ -124,6 +125,36 @@ export function useDeleteMemory() {
     mutationFn: (memory: Memory) => deleteMemory(memory),
     onSuccess: (_d, memory) => {
       client.setQueryData<Memory[]>(key, (list) => list?.filter((m) => m.id !== memory.id))
+      void client.invalidateQueries({ queryKey: key })
+      void client.invalidateQueries({ queryKey: qk.activity(couple?.id) })
+    },
+  })
+}
+
+export function useNotes() {
+  const { couple } = useCouple()
+  return useQuery({
+    queryKey: qk.notes(couple?.id),
+    queryFn: () => fetchNotes(couple!.id),
+    enabled: Boolean(couple),
+  })
+}
+
+/** Read or taken back: removed from the screen at once, deleted on the server. */
+export function useRemoveNote() {
+  const client = useQueryClient()
+  const { couple } = useCouple()
+  const key = qk.notes(couple?.id)
+  return useMutation({
+    mutationFn: (note: Note) => removeNote(note.id),
+    onMutate: async (note) => {
+      await client.cancelQueries({ queryKey: key })
+      const previous = client.getQueryData<Note[]>(key)
+      client.setQueryData<Note[]>(key, (list) => list?.filter((n) => n.id !== note.id))
+      return { previous }
+    },
+    onError: (_e, _n, ctx) => ctx?.previous && client.setQueryData(key, ctx.previous),
+    onSettled: () => {
       void client.invalidateQueries({ queryKey: key })
       void client.invalidateQueries({ queryKey: qk.activity(couple?.id) })
     },

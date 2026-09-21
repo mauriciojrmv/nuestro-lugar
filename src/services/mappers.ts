@@ -1,5 +1,5 @@
-import type { ActivityRow, CoupleRow, LetterRow, MemoryPhotoRow, MemoryRow, ProfileRow } from '@/types/database'
-import type { Activity, Couple, Letter, Memory, Photo, Profile } from '@/types/domain'
+import type { ActivityRow, CoupleRow, LetterRow, MemoryPhotoRow, MemoryRow, NoteRow, ProfileRow } from '@/types/database'
+import type { Activity, Couple, Letter, Memory, Note, Photo, Profile } from '@/types/domain'
 
 export const toProfile = (r: ProfileRow): Profile => ({
   id: r.id,
@@ -59,6 +59,14 @@ export const toLetter = (r: LetterRow): Letter => ({
   date: r.letter_date,
   body: r.body,
   readAt: r.read_at,
+  createdAt: r.created_at,
+})
+
+export const toNote = (r: NoteRow): Note => ({
+  id: r.id,
+  authorId: r.author_id,
+  recipientId: r.recipient_id,
+  body: r.body,
   createdAt: r.created_at,
 })
 
