@@ -20,6 +20,9 @@ import { Sheet, SheetAction, SheetHeader } from '@/components/ui/Sheet'
 import { Spinner } from '@/components/ui/Spinner'
 import { InviteCode } from '@/components/couple/InviteCode'
 import { shortName } from '@/utils/names'
+import { useStorageUsage } from '@/hooks/useStorageUsage'
+import { formatBytes } from '@/services/usage'
+import { ProgressBar } from '@/components/ui/Feedback'
 
 type Editing = { title: string; value: string; type?: 'text' | 'date'; optional?: boolean; save: (v: string) => Promise<void> }
 
@@ -33,6 +36,7 @@ export function SettingsPage() {
   const [editing, setEditing] = useState<Editing | null>(null)
   const [avatarBusy, setAvatarBusy] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const usage = useStorageUsage()
 
   const refreshCouple = () => client.invalidateQueries({ queryKey: qk.couple(user?.id) })
 
@@ -161,6 +165,23 @@ export function SettingsPage() {
           />
         </div>
         <ListRow icon={<Bell />} label="Avisos" trailing={<Toggle checked={liveNotices} onChange={setLiveNotices} label="Avisos" />} />
+      </ListGroup>
+
+      <ListGroup
+        title="Almacenamiento"
+        footer={
+          usage.nearLimit
+            ? 'Se está llenando. Exporten una copia y amplíen el espacio antes de que se llene, o no se podrán subir más fotos ni videos.'
+            : 'Incluye fotos, videos y fotos de perfil. Los videos ocupan mucho más que las fotos.'
+        }
+      >
+        <div className="px-4 py-4">
+          <div className="flex items-baseline justify-between text-[16px]">
+            <span>{usage.isLoading ? 'Calculando…' : `${formatBytes(usage.used)} de ${formatBytes(usage.limit)}`}</span>
+            <span className="text-[15px] text-muted tabular-nums">{Math.min(100, Math.round(usage.ratio * 100))}%</span>
+          </div>
+          <ProgressBar value={usage.ratio} className={usage.nearLimit ? 'mt-3 [&>div]:bg-rose' : 'mt-3'} />
+        </div>
       </ListGroup>
 
       <ListGroup

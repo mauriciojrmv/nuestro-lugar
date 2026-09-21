@@ -15,6 +15,8 @@ export interface NewPhotoRow {
   height: number
   size_bytes: number
   position: number
+  media_type: 'image' | 'video'
+  duration_seconds: number | null
   created_by: string
 }
 

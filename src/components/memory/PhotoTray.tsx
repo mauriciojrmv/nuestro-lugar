@@ -12,9 +12,10 @@ import {
 import { SortableContext, arrayMove, rectSortingStrategy, sortableKeyboardCoordinates, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { motion } from 'motion/react'
-import { Plus, X } from 'lucide-react'
+import { Play, Plus, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import type { DraftPhoto } from '@/services/memorySave'
+import { isVideoFile } from '@/utils/video'
 
 interface Props {
   photos: DraftPhoto[]
@@ -116,7 +117,10 @@ function SortableThumb({
           isDragging && 'shadow-[0_12px_30px_rgb(0_0_0/0.3)]',
         )}
       >
-        {!failed ? (
+        {isVideoFile(photo.file) ? (
+          // "#t=0.1" makes Safari paint a first frame instead of a blank box.
+          <video src={`${photo.previewUrl}#t=0.1`} muted playsInline preload="metadata" className="pointer-events-none size-full object-cover" />
+        ) : !failed ? (
           <img
             src={photo.previewUrl}
             alt=""
@@ -128,6 +132,13 @@ function SortableThumb({
           <div className="grid size-full place-items-center px-2 text-center text-[11px] text-muted">{photo.file.name}</div>
         )}
       </motion.div>
+      {isVideoFile(photo.file) && (
+        <span className="pointer-events-none absolute inset-0 grid place-items-center">
+          <span className="grid size-10 place-items-center rounded-full bg-black/45 text-white backdrop-blur-md">
+            <Play className="ml-0.5 size-5 fill-white" strokeWidth={0} />
+          </span>
+        </span>
+      )}
       {cover && (
         <span className="pointer-events-none absolute bottom-1.5 left-1.5 rounded-full bg-black/55 px-2.5 py-0.5 text-[12px] font-semibold text-white backdrop-blur-md">
           Portada
@@ -138,7 +149,7 @@ function SortableThumb({
         onPointerDown={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
         onClick={onRemove}
-        aria-label="Quitar foto"
+        aria-label={isVideoFile(photo.file) ? 'Quitar video' : 'Quitar foto'}
         className="absolute top-1 right-1 grid size-8 place-items-center rounded-full bg-black/55 text-white ring-1 ring-white/20 backdrop-blur-md transition-transform after:absolute after:-inset-2 after:content-[''] active:scale-90"
       >
         <X className="size-[18px]" strokeWidth={2.6} />

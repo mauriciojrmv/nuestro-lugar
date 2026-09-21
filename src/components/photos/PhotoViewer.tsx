@@ -208,7 +208,7 @@ export function PhotoViewer({ entries: initialEntries, startIndex, onClose }: Pr
             },
           },
           { label: 'Descargar', icon: <Download />, onSelect: () => void download() },
-          ...(canDelete ? [{ label: 'Eliminar foto', icon: <Trash2 />, destructive: true, onSelect: () => setConfirmDelete(true) }] : []),
+          ...(canDelete ? [{ label: entry.photo.mediaType === 'video' ? 'Eliminar video' : 'Eliminar foto', icon: <Trash2 />, destructive: true, onSelect: () => setConfirmDelete(true) }] : []),
         ]}
       />
       <ConfirmSheet
@@ -239,6 +239,42 @@ function ViewerButton({ label, onClick, children }: { label: string; onClick: ()
 
 /** Thumbnail first (already cached), then the full image fades in exactly over it. Pinch or double-tap to zoom. */
 function ViewerImage({
+  entry,
+  onZoomChange,
+  onSingleTap,
+}: {
+  entry: PhotoEntry
+  onZoomChange: (zoomed: boolean) => void
+  onSingleTap: () => void
+}) {
+  if (entry.photo.mediaType === 'video') return <ViewerVideo entry={entry} />
+  return <ZoomableImage entry={entry} onZoomChange={onZoomChange} onSingleTap={onSingleTap} />
+}
+
+/** Native controls: play, scrub, full screen, AirPlay. Swiping still changes item. */
+function ViewerVideo({ entry }: { entry: PhotoEntry }) {
+  const poster = useSignedUrl(entry.photo.thumbPath)
+  const src = useSignedUrl(entry.photo.storagePath)
+  return (
+    <div className="grid size-full place-items-center px-0 pt-[calc(env(safe-area-inset-top)+64px)] pb-[calc(env(safe-area-inset-bottom)+96px)]">
+      {src.url ? (
+        <video
+          key={src.url}
+          src={src.url}
+          poster={poster.url ?? undefined}
+          controls
+          playsInline
+          preload="metadata"
+          className="max-h-full max-w-full rounded-[4px] bg-black"
+        />
+      ) : (
+        poster.url && <img src={poster.url} alt="" className="max-h-full max-w-full object-contain opacity-70" />
+      )}
+    </div>
+  )
+}
+
+function ZoomableImage({
   entry,
   onZoomChange,
   onSingleTap,

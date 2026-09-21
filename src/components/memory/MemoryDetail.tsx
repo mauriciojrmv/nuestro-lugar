@@ -13,6 +13,7 @@ import { SignedImage } from '@/components/ui/SignedImage'
 import { IconButton } from '@/components/ui/IconButton'
 import { ActionSheet, ConfirmSheet } from '@/components/ui/ActionSheet'
 import { PhotoGrid } from '@/components/photos/PhotoGrid'
+import { VideoBadge } from '@/components/photos/VideoBadge'
 import { safeFileName } from '@/utils/download'
 import type { Memory, PhotoEntry } from '@/types/domain'
 import { FavoriteButton } from './FavoriteButton'
@@ -103,13 +104,18 @@ export function MemoryDetail({ memory, showDate = true, afterDelete }: Props) {
       </div>
 
       {first && (
-        <button onClick={() => openViewer(entries, 0)} className="mt-5 block w-full transition-transform duration-200 active:scale-[0.99]" aria-label="Abrir foto">
+        <button
+          onClick={() => openViewer(entries, 0)}
+          className="relative mt-5 block w-full transition-transform duration-200 active:scale-[0.99]"
+          aria-label={first.photo.mediaType === 'video' ? 'Reproducir video' : 'Abrir foto'}
+        >
           <SignedImage
-            path={first.photo.storagePath}
+            path={first.photo.mediaType === 'video' ? first.photo.thumbPath : first.photo.storagePath}
             eager
             frameClassName="w-full rounded-[22px] max-h-[78vh]"
             frameStyle={{ aspectRatio: first.photo.width && first.photo.height ? `${first.photo.width} / ${first.photo.height}` : '4 / 5' }}
           />
+          <VideoBadge photo={first.photo} large />
         </button>
       )}
       {rest.length > 0 && <PhotoGrid entries={rest} context={entries} columns="memory" className="mt-1" />}

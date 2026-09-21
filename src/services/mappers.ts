@@ -25,6 +25,8 @@ export const toPhoto = (r: MemoryPhotoRow): Photo => ({
   width: r.width,
   height: r.height,
   position: r.position,
+  mediaType: r.media_type ?? 'image',
+  durationSeconds: r.duration_seconds === null ? null : Number(r.duration_seconds),
   createdBy: r.created_by,
   createdAt: r.created_at,
 })
@@ -77,5 +79,6 @@ export const toActivity = (r: ActivityRow): Activity => ({
   memoryId: r.memory_id,
   letterId: r.letter_id,
   photoCount: r.photo_count,
+  videoCount: r.video_count ?? 0,
   createdAt: r.created_at,
 })

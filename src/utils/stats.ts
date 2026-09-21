@@ -4,6 +4,7 @@ import type { Memory } from '@/types/domain'
 export interface ArchiveStats {
   memories: number
   photos: number
+  videos: number
   specialDays: number
   first: Memory | null
   busiestMonth: string | null
@@ -13,9 +14,10 @@ export interface ArchiveStats {
 export function computeStats(memories: Memory[]): ArchiveStats {
   const perMonth = new Map<string, number>()
   let photos = 0
+  let videos = 0
   const special = new Set<string>()
   for (const m of memories) {
-    photos += m.photos.length
+    for (const p of m.photos) p.mediaType === 'video' ? videos++ : photos++
     if (m.favoritedBy.length) special.add(m.date)
     const key = m.date.slice(0, 7)
     perMonth.set(key, (perMonth.get(key) ?? 0) + 1)
@@ -28,6 +30,7 @@ export function computeStats(memories: Memory[]): ArchiveStats {
   return {
     memories: memories.length,
     photos,
+    videos,
     specialDays: special.size,
     first,
     busiestMonth: busiestDate ? formatMonthYear(busiestDate.getFullYear(), busiestDate.getMonth()) : null,

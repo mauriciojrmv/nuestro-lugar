@@ -24,6 +24,9 @@ export interface Photo {
   width: number | null
   height: number | null
   position: number
+  /** Photos and videos share one list per memory. */
+  mediaType: 'image' | 'video'
+  durationSeconds: number | null
   createdBy: string | null
   createdAt: string
 }
@@ -78,6 +81,7 @@ export interface Activity {
   memoryId: string | null
   letterId: string | null
   photoCount: number
+  videoCount: number
   createdAt: string
 }
 

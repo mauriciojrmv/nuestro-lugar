@@ -10,6 +10,8 @@ import { EmptyState, ErrorState, Skeleton } from '@/components/ui/Feedback'
 import { MemoryCard } from '@/components/memory/MemoryCard'
 import { InviteCode } from '@/components/couple/InviteCode'
 import { FloatingNotes } from '@/components/notes/FloatingNotes'
+import { useStorageUsage } from '@/hooks/useStorageUsage'
+import { formatBytes } from '@/services/usage'
 import { activityLine } from '@/utils/activityText'
 import { rediscover } from '@/utils/rediscover'
 import type { Activity } from '@/types/domain'
@@ -23,6 +25,7 @@ export function HomePage() {
   const latest = memories.find((m) => m.date !== today)
   const back = rediscover(memories, today)
   const showBack = back && back.memory.id !== latest?.id
+  const usage = useStorageUsage()
 
   return (
     <div className="mx-auto max-w-[640px]">
@@ -44,6 +47,15 @@ export function HomePage() {
       </header>
 
       <FloatingNotes />
+
+      {usage.nearLimit && (
+        <Link to="/ajustes" className="mb-10 block rounded-[20px] bg-rose/10 px-5 py-4 ring-1 ring-rose/25 active:opacity-70">
+          <span className="block text-[16px] font-semibold text-rose">El espacio se está llenando</span>
+          <span className="mt-1 block text-[15px] text-ink-2">
+            {formatBytes(usage.used)} de {formatBytes(usage.limit)}. Toca para ver las opciones.
+          </span>
+        </Link>
+      )}
 
       {!complete && couple?.inviteCode && (
         <section className="mb-10 animate-rise rounded-[24px] bg-surface p-6">

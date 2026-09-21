@@ -1,16 +1,24 @@
 import type { Activity } from '@/types/domain'
+import { mediaLabel } from './media'
 
-const photos = (n: number) => (n === 1 ? 'una foto' : `${n} fotos`)
+/** "una foto", "un video", "3 fotos", "2 fotos y 1 video" */
+function media(a: Activity) {
+  if (a.photoCount === 1 && !a.videoCount) return 'una foto'
+  if (a.videoCount === 1 && !a.photoCount) return 'un video'
+  return mediaLabel(a.photoCount, a.videoCount)
+}
 
-/** Quiet line for the Home feed: "Favi agregó 3 fotos." / "Agregaste un recuerdo." */
+const hasMedia = (a: Activity) => a.photoCount + a.videoCount > 0
+
+/** Quiet line for the Home feed: "Favi agregó 3 fotos." / "Guardaste un recuerdo." */
 export function activityLine(a: Activity, actorName: string, isMe: boolean): string {
   switch (a.kind) {
     case 'memory':
-      if (a.photoCount > 0)
-        return isMe ? `Guardaste un recuerdo con ${photos(a.photoCount)}.` : `${actorName} guardó un recuerdo con ${photos(a.photoCount)}.`
+      if (hasMedia(a))
+        return isMe ? `Guardaste un recuerdo con ${media(a)}.` : `${actorName} guardó un recuerdo con ${media(a)}.`
       return isMe ? 'Guardaste un recuerdo.' : `${actorName} guardó un recuerdo.`
     case 'photos':
-      return isMe ? `Agregaste ${photos(a.photoCount)}.` : `${actorName} agregó ${photos(a.photoCount)}.`
+      return isMe ? `Agregaste ${media(a)}.` : `${actorName} agregó ${media(a)}.`
     case 'favorite':
       return isMe ? 'Marcaste un momento como favorito.' : `${actorName} marcó un momento como favorito.`
     case 'letter':
@@ -26,11 +34,11 @@ export function activityLine(a: Activity, actorName: string, isMe: boolean): str
 export function liveLine(a: Activity, actorName: string): string {
   switch (a.kind) {
     case 'memory':
-      return a.photoCount > 0
-        ? `${actorName} acaba de guardar un recuerdo con ${photos(a.photoCount)}.`
+      return hasMedia(a)
+        ? `${actorName} acaba de guardar un recuerdo con ${media(a)}.`
         : `${actorName} acaba de guardar un recuerdo.`
     case 'photos':
-      return `${actorName} acaba de agregar ${photos(a.photoCount)}.`
+      return `${actorName} acaba de agregar ${media(a)}.`
     case 'favorite':
       return `${actorName} marcó un momento como favorito.`
     case 'letter':

@@ -1,4 +1,5 @@
 import { prepareImage, type PreparedImage } from '@/utils/image'
+import { isVideoFile, prepareVideo, type PreparedVideo } from '@/utils/video'
 import { insertMemory, setMemoryCover, updateMemory, type MemoryFields } from './memories'
 import { insertPhotos, type NewPhotoRow } from './photos'
 import { photoPaths, photoStorage } from './storage'
@@ -8,7 +9,7 @@ export interface DraftPhoto {
   file: File
   previewUrl: string
   /** Cached between retries so nothing is processed or uploaded twice. */
-  prepared?: PreparedImage
+  prepared?: (PreparedImage & { duration?: undefined }) | PreparedVideo
   uploaded?: boolean
 }
 
@@ -43,7 +44,8 @@ export async function runSaveJob(job: SaveJob, onProgress: ProgressFn) {
   // 1 · Prepare (decode, thumbnail, maybe re-encode)
   for (let i = 0; i < photos.length; i++) {
     onProgress('preparing', i / Math.max(photos.length, 1))
-    photos[i].prepared ??= await prepareImage(photos[i].file)
+    const file = photos[i].file
+    photos[i].prepared ??= isVideoFile(file) ? await prepareVideo(file) : await prepareImage(file)
   }
 
   // 2 · Upload with byte-level progress
@@ -97,11 +99,14 @@ export async function runSaveJob(job: SaveJob, onProgress: ProgressFn) {
         height: prepared.height,
         size_bytes: prepared.main.size,
         position: job.startPosition + i,
+        media_type: prepared.duration === undefined ? 'image' : 'video',
+        duration_seconds: prepared.duration === undefined ? null : Math.round(prepared.duration * 100) / 100,
         created_by: job.userId,
       }
     })
     await insertPhotos(rows)
     job.photosSaved = true
+    // Whatever is first in the tray is the cover (a video's still frame works too).
     if (job.setCover) await setMemoryCover(job.memoryId, photos[0].id)
   }
 }

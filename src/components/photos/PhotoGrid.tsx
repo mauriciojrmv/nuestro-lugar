@@ -1,5 +1,6 @@
 import { cn } from '@/lib/cn'
 import { SignedImage } from '@/components/ui/SignedImage'
+import { VideoBadge } from './VideoBadge'
 import { useViewer } from '@/providers/ViewerProvider'
 import type { PhotoEntry } from '@/types/domain'
 
@@ -29,13 +30,14 @@ export function PhotoGrid({ entries, context, className, columns = 'photos' }: P
           key={entry.photo.id}
           onClick={() => open(all, all.indexOf(entry))}
           className="group relative overflow-hidden rounded-[14px] transition-transform duration-200 active:scale-[0.97]"
-          aria-label={`Abrir foto${entry.memory.title ? ` de ${entry.memory.title}` : ''}`}
+          aria-label={`Abrir ${entry.photo.mediaType === 'video' ? 'video' : 'foto'}${entry.memory.title ? ` de ${entry.memory.title}` : ''}`}
         >
           <SignedImage
             path={entry.photo.thumbPath ?? entry.photo.storagePath}
             frameClassName="aspect-square w-full"
             className="transition-transform duration-500 group-hover:scale-[1.03]"
           />
+          <VideoBadge photo={entry.photo} />
         </button>
       ))}
     </div>

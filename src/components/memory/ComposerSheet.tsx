@@ -5,6 +5,8 @@ import { Sheet } from '@/components/ui/Sheet'
 import { LetterForm } from '@/components/letters/LetterForm'
 import { NoteForm } from '@/components/notes/NoteForm'
 import { useSaveMemory } from '@/hooks/useSaveMemory'
+import { isVideoFile, MAX_VIDEO_BYTES } from '@/utils/video'
+import { useToast } from '@/providers/ToastProvider'
 import { useCouple } from '@/providers/CoupleProvider'
 import { shortName } from '@/utils/names'
 import { todayISO, type ISODate } from '@/lib/dates'
@@ -50,6 +52,7 @@ export function ComposerSheet({ request, onClose }: Props) {
   const fileRef = useRef<HTMLInputElement>(null)
   const { state, save, backToForm } = useSaveMemory()
   const { partner } = useCouple()
+  const toast = useToast()
   const photosRef = useRef(photos)
   photosRef.current = photos
 
@@ -74,8 +77,17 @@ export function ComposerSheet({ request, onClose }: Props) {
 
   const addFiles = (files: FileList | null) => {
     if (!files?.length) return
-    const drafts: DraftPhoto[] = [...files]
-      .filter((f) => f.type.startsWith('image/') || /\.(heic|heif)$/i.test(f.name))
+    const picked = [...files].filter((f) => f.type.startsWith('image/') || /\.(heic|heif)$/i.test(f.name) || isVideoFile(f))
+    // Say it right away, not after tapping Guardar.
+    const tooLong = picked.filter((f) => isVideoFile(f) && f.size > MAX_VIDEO_BYTES)
+    if (tooLong.length)
+      toast({
+        message: tooLong.length === 1 ? 'Ese video es muy largo (máx. unos 30 s). Recórtalo en tu galería y vuelve a elegirlo.' : 'Algunos videos son muy largos (máx. unos 30 s). Recórtalos y vuelve a elegirlos.',
+        tone: 'error',
+        duration: 6000,
+      })
+    const drafts: DraftPhoto[] = picked
+      .filter((f) => !tooLong.includes(f))
       .map((file) => ({ id: crypto.randomUUID(), file, previewUrl: URL.createObjectURL(file) }))
     setPhotos((prev) => [...prev, ...drafts])
     setMode('memory')
@@ -90,7 +102,7 @@ export function ComposerSheet({ request, onClose }: Props) {
       key: 'memory',
       icon: <Images />,
       label: 'Recuerdo',
-      hint: 'Para siempre',
+      hint: 'Fotos y videos',
       onClick: () => {
         setMode('memory')
         pick()
@@ -164,7 +176,7 @@ export function ComposerSheet({ request, onClose }: Props) {
       <input
         ref={fileRef}
         type="file"
-        accept="image/*,.heic,.heif"
+        accept="image/*,video/*,.heic,.heif"
         multiple
         hidden
         onChange={(e) => {

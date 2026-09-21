@@ -8,6 +8,7 @@ import { signOut } from '@/services/auth'
 import { CouplePair } from '@/components/ui/Avatar'
 import { ListGroup, ListRow } from '@/components/ui/List'
 import { computeStats } from '@/utils/stats'
+import { mediaLabel } from '@/utils/media'
 
 export function MorePage() {
   const { user } = useAuth()
@@ -27,7 +28,8 @@ export function MorePage() {
         {couple?.startDate && <p className="mt-1 font-serif text-[15px] text-accent italic">Desde el {formatLong(couple.startDate)}.</p>}
         {stats.memories > 0 && (
           <p className="mt-3 text-[14px] text-muted">
-            {stats.memories} {stats.memories === 1 ? 'recuerdo' : 'recuerdos'} · {stats.photos} {stats.photos === 1 ? 'foto' : 'fotos'}
+            {stats.memories} {stats.memories === 1 ? 'recuerdo' : 'recuerdos'}
+            {stats.photos + stats.videos > 0 && ` · ${mediaLabel(stats.photos, stats.videos)}`}
           </p>
         )}
       </header>

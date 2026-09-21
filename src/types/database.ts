@@ -54,6 +54,8 @@ export interface MemoryPhotoRow {
   height: number | null
   size_bytes: number | null
   position: number
+  media_type: 'image' | 'video'
+  duration_seconds: number | null
   created_by: string | null
   created_at: string
 }
@@ -96,5 +98,6 @@ export interface ActivityRow {
   letter_id: string | null
   note_id: string | null
   photo_count: number
+  video_count: number
   created_at: string
 }

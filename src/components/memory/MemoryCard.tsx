@@ -6,6 +6,8 @@ import { coverOf } from '@/hooks/useArchive'
 import { useCouple } from '@/providers/CoupleProvider'
 import { SignedImage } from '@/components/ui/SignedImage'
 import type { Memory } from '@/types/domain'
+import { VideoBadge } from '@/components/photos/VideoBadge'
+import { mediaLabelOf } from '@/utils/media'
 
 /** Large, photo-first card. Text memories get a quiet typographic card instead. */
 export function MemoryCard({ memory, eyebrow, className }: { memory: Memory; eyebrow?: string; className?: string }) {
@@ -26,9 +28,10 @@ export function MemoryCard({ memory, eyebrow, className }: { memory: Memory; eye
             alt={memory.title ?? ''}
             frameClassName="aspect-[4/5] w-full rounded-[24px] sm:aspect-[4/3]"
           />
+          <VideoBadge photo={cover} large />
           {memory.photos.length > 1 && (
             <span className="absolute top-3 right-3 rounded-full bg-black/55 px-3 py-1 text-[13px] font-semibold text-white backdrop-blur-md tabular-nums">
-              {memory.photos.length} fotos
+              {mediaLabelOf(memory.photos)}
             </span>
           )}
         </div>
@@ -72,7 +75,7 @@ export function MemoryRow({ memory }: { memory: Memory }) {
       <div className="min-w-0 flex-1">
         <p className="truncate text-[17px] font-semibold">{memory.title || (cover ? 'Sin título' : memory.body?.split('\n')[0])}</p>
         <p className="truncate text-[15px] text-muted">
-          {memory.photos.length > 0 && `${memory.photos.length} ${memory.photos.length === 1 ? 'foto' : 'fotos'} · `}
+          {memory.photos.length > 0 && `${mediaLabelOf(memory.photos)} · `}
           {nameOf(memory.createdBy)}
         </p>
       </div>

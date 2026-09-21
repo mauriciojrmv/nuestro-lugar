@@ -75,6 +75,8 @@ function memoryJson(m: Memory, profiles: Profile[], files: string[], letters: Le
     favorito_de: m.favoritedBy.map((id) => nameOf(profiles, id)),
     fotos: m.photos.map((p, i) => ({
       archivo: files[i],
+      tipo: p.mediaType === 'video' ? 'video' : 'foto',
+      duracion_segundos: p.durationSeconds,
       nombre_original: p.originalFilename,
       ancho: p.width,
       alto: p.height,
@@ -155,7 +157,7 @@ export async function exportArchive(
 
       for (const [i, photo] of memory.photos.entries()) {
         if (signal?.aborted) throw new DOMException('Aborted', 'AbortError')
-        const file = `foto-${String(i + 1).padStart(2, '0')}.${ext(photo.storagePath)}`
+        const file = `${photo.mediaType === 'video' ? 'video' : 'foto'}-${String(i + 1).padStart(2, '0')}.${ext(photo.storagePath)}`
         const blob = await photoStorage.download(photo.storagePath)
         addFile(`${folder}/${file}`, new Uint8Array(await blob.arrayBuffer()), false)
         files.push(file)

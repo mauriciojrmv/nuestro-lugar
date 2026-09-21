@@ -6,7 +6,7 @@ Webapp privada para dos personas: el archivo de una relación. Fotografías, rec
 
 - **Inicio**: el día de hoy, el recuerdo más reciente, uno antiguo que vuelve a aparecer y la actividad reciente.
 - **Calendario**: el mes como un mapa de la relación, con miniaturas en los días con fotos.
-- **Fotos**: rejilla a pantalla completa y visor con gestos (deslizar, tocar, deslizar hacia abajo para cerrar).
+- **Fotos y videos**: rejilla a pantalla completa y visor con gestos (deslizar, pellizcar para ampliar, deslizar hacia abajo para cerrar). Videos cortos de hasta 50 MB (≈ 30 s).
 - **Historia**: la línea de tiempo, que crece sola.
 - **Momentos**: los recuerdos marcados con ♡.
 - **Cartitas**: cartas privadas entre los dos (no es un chat).
@@ -72,6 +72,7 @@ Tienes dos opciones:
 2. `supabase/migrations/20260921000002_security.sql`: RLS, funciones de pareja y actividad
 3. `supabase/migrations/20260921000003_storage_realtime.sql`: bucket privado, políticas de Storage y Realtime
 4. `supabase/migrations/20260922000001_notes.sql`: notitas (se leen una vez)
+5. `supabase/migrations/20260922000002_videos_limits.sql`: videos, un solo espacio por instalación y medidor de almacenamiento
 
 **B · Supabase CLI.**
 
@@ -166,6 +167,7 @@ La privacidad no depende de ocultar botones. Está en la base de datos:
 
 - **RLS en todas las tablas.** Cada fila pertenece a un `couple_id` y solo sus miembros pueden leerla (`is_couple_member`). Los visitantes anónimos no tienen ningún acceso.
 - **FKs compuestas** `(memory_id, couple_id)`: es imposible enlazar una foto, un favorito o una carta de una pareja a un recuerdo de otra.
+- **Un solo espacio por instalación.** Aunque los registros sigan abiertos, una cuenta ajena no puede crear otro espacio ni subir archivos, así que no puede gastar su almacenamiento.
 - **Una cuenta, una pareja.** `couple_members.user_id` es único. Crear o unirse solo es posible mediante RPCs `security definer`, que validan el código, bloquean la fila y limitan a 2 miembros. El código se retira cuando la pareja está completa.
 - **Autoría inmutable** (triggers). Solo el autor elimina un recuerdo o una foto. Quien recibe una carta solo puede marcarla como leída.
 - **La actividad la escriben triggers**, así que no se puede falsificar desde el cliente.
@@ -196,6 +198,19 @@ La app solo habla con la interfaz `PhotoStorage` (`src/services/storage/types.ts
 1. Crea `src/services/storage/r2Storage.ts` implementando la interfaz. Las URLs firmadas de R2 deben emitirse desde un Worker o una Edge Function que verifique el JWT de Supabase y la pertenencia a la pareja, **nunca** con credenciales en el frontend.
 2. Cambia una línea en `src/services/storage/provider.ts`.
 3. Copia los objetos conservando las mismas rutas. `memory_photos.storage_path` no cambia.
+
+## Almacenamiento y límites
+
+**Configuración → Almacenamiento** muestra el espacio usado, y al llegar al 80 % aparece un aviso en Inicio. Con el plan gratis de Supabase:
+
+- **1 GB** de archivos en total y **50 MB por archivo**.
+- **5 GB al mes de descarga**. Las fotos ya vistas se guardan en el móvil y no vuelven a descargarse; los videos sí, cada vez que se reproducen.
+- Si nadie abre la app durante **7 días**, Supabase pausa el proyecto. Se reactiva desde el panel.
+
+Cuando se acerquen al límite, hay dos caminos:
+
+1. **Supabase Pro** (≈ 25 USD/mes): 100 GB y sin pausas. No hay que tocar código; solo hay que ajustar `VITE_STORAGE_LIMIT_MB` para que el medidor lo refleje.
+2. **Cloudflare R2**: 10 GB gratis y después ≈ 0,015 USD por GB al mes, sin cargos de descarga. Ideal si hay muchos videos. Ver «Cambiar el almacenamiento a Cloudflare R2».
 
 ## Copias de seguridad
 

@@ -24,6 +24,8 @@ const KNOWN: Array<[RegExp, string]> = [
   [/jwt expired|invalid jwt|refresh token/i, 'Tu sesión expiró. Vuelve a entrar.'],
   [/payload too large|exceeded the maximum allowed size/i, 'Esta foto es demasiado grande.'],
   [/unsupported_image/, 'No pudimos leer esta imagen en este dispositivo.'],
+  [/space_taken/, 'Este lugar ya pertenece a otra pareja.'],
+  [/mime type .* is not supported|invalid_mime_type/i, 'Este formato no se puede guardar.'],
 ]
 
 export function isNetworkError(error: unknown): boolean {

@@ -1,17 +1,19 @@
 import { useCallback, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { qk } from '@/lib/queryKeys'
-import { humanizeError, isNetworkError } from '@/lib/errors'
+import { AppError, humanizeError, isNetworkError } from '@/lib/errors'
 import { runSaveJob, type DraftPhoto, type SaveJob, type SavePhase } from '@/services/memorySave'
 import type { MemoryFields } from '@/services/memories'
 import { enqueue } from '@/services/outbox'
 import { useAuth } from '@/providers/AuthProvider'
 import { useCouple } from '@/providers/CoupleProvider'
 import type { Memory } from '@/types/domain'
+import { mediaLabel } from '@/utils/media'
+import { isVideoFile } from '@/utils/video'
 
 export type SaveState =
   | { status: 'idle' }
-  | { status: 'working'; phase: SavePhase; progress: number; photoCount: number }
+  | { status: 'working'; phase: SavePhase; progress: number; photoCount: number; mediaText: string }
   | { status: 'done'; offline: boolean; first: boolean }
   | { status: 'error'; message: string }
 
@@ -83,19 +85,22 @@ export function useSaveMemory() {
       if (!job.memorySaved) job.fields = fields
       if (!job.photosSaved) job.photos = photos
 
-      setState({ status: 'working', phase: 'preparing', progress: 0, photoCount: photos.length })
+      const videos = photos.filter((p) => isVideoFile(p.file)).length
+      const mediaText = mediaLabel(photos.length - videos, videos)
+      setState({ status: 'working', phase: 'preparing', progress: 0, photoCount: photos.length, mediaText })
       try {
         await runSaveJob(job, (phase, progress) =>
-          setState({ status: 'working', phase, progress, photoCount: photos.length }),
+          setState({ status: 'working', phase, progress, photoCount: photos.length, mediaText }),
         )
         jobRef.current = null
         await Promise.all([
           client.invalidateQueries({ queryKey: key }),
           client.invalidateQueries({ queryKey: qk.activity(couple.id) }),
+          client.invalidateQueries({ queryKey: qk.usage(couple.id) }),
         ])
         setState({ status: 'done', offline: false, first })
       } catch (error) {
-        console.error(error)
+        if (!(error instanceof AppError)) console.error(error)
         setState({
           status: 'error',
           message: isNetworkError(error)

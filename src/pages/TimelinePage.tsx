@@ -7,6 +7,7 @@ import { useCouple } from '@/providers/CoupleProvider'
 import { useComposer } from '@/providers/ComposerProvider'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { SignedImage } from '@/components/ui/SignedImage'
+import { VideoBadge } from '@/components/photos/VideoBadge'
 import { Button } from '@/components/ui/Button'
 import { EmptyState, Skeleton } from '@/components/ui/Feedback'
 import { computeStats } from '@/utils/stats'
@@ -37,6 +38,7 @@ export function TimelinePage() {
         <div className="mb-10 flex flex-wrap gap-x-6 gap-y-2 text-[15px] text-muted">
           <Stat value={stats.memories} one="recuerdo" many="recuerdos" />
           <Stat value={stats.photos} one="foto" many="fotos" />
+          {stats.videos > 0 && <Stat value={stats.videos} one="video" many="videos" />}
           {stats.specialDays > 0 && <Stat value={stats.specialDays} one="día especial" many="días especiales" />}
           {stats.busiestMonth && (
             <span className="basis-full text-[15px]">El mes con más recuerdos: {stats.busiestMonth}.</span>
@@ -89,10 +91,10 @@ export function TimelinePage() {
                 <Link to={`/recuerdo/${m.id}`} className="block transition-transform duration-200 active:scale-[0.985]">
                   <p className="eyebrow">{formatShort(m.date)}</p>
                   {cover && (
-                    <SignedImage
-                      path={cover.thumbPath ?? cover.storagePath}
-                      frameClassName="mt-3 aspect-[4/3] w-full rounded-[22px]"
-                    />
+                    <div className="relative mt-3">
+                      <SignedImage path={cover.thumbPath ?? cover.storagePath} frameClassName="aspect-[4/3] w-full rounded-[22px]" />
+                      <VideoBadge photo={cover} large />
+                    </div>
                   )}
                   {m.title && <p className="mt-3 text-[19px] leading-snug font-semibold tracking-[-0.02em] text-balance">{m.title}</p>}
                   {m.body && <p className="mt-1 line-clamp-2 text-[15px] text-pretty text-muted">{m.body}</p>}

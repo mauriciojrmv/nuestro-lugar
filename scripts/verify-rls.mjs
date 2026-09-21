@@ -6,7 +6,8 @@
  * Creates three throwaway accounts: A and B share a couple, C is an outsider.
  * Every assertion is made with the public anon key only, exactly like the app.
  * Requires sign-ups enabled and email confirmation off (true for `supabase start`).
- * Run it against a local or staging project, not the one with your real memories.
+ * Run it against a fresh local or staging project (it creates the one space the
+ * installation allows), never against the one with your real memories.
  */
 import { createClient } from '@supabase/supabase-js'
 
@@ -51,6 +52,10 @@ const { error: joinErr } = await B.client.rpc('join_couple', { p_code: couple.in
 ok(!joinErr, 'B joins with the code (case-insensitive)')
 const { error: thirdErr } = await C.client.rpc('join_couple', { p_code: couple.invite_code })
 ok(Boolean(thirdErr), 'C cannot join a complete couple (code is retired)')
+const { error: secondSpace } = await C.client.rpc('create_couple', { p_name: 'Otro', p_start_date: null })
+ok(/space_taken/.test(secondSpace?.message ?? ''), 'C cannot create another space (one space per installation)')
+const { error: cAvatar } = await C.client.storage.from('memories').upload(`avatars/${C.id}/x.jpg`, new Uint8Array([0xff, 0xd8, 0xff, 0xd9]), { contentType: 'image/jpeg' })
+ok(Boolean(cAvatar), 'C cannot upload anything, not even an avatar')
 const { data: cCouple } = await C.client.from('couples').select('*')
 ok(cCouple?.length === 0, 'C cannot see the couple')
 const { error: forgeMember } = await C.client.from('couple_members').insert({ couple_id: couple.id, user_id: C.id })

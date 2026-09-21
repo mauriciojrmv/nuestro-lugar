@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/Feedback'
 import { PhotoGrid } from '@/components/photos/PhotoGrid'
 import type { PhotoEntry } from '@/types/domain'
+import { mediaLabelOf } from '@/utils/media'
 
 export function PhotosPage() {
   const { photos, isLoading, isError, refetch } = useArchive()
@@ -32,7 +33,7 @@ export function PhotosPage() {
     <div>
       <PageHeader
         title="Fotos"
-        subtitle={photos.length > 0 ? `${photos.length} ${photos.length === 1 ? 'foto' : 'fotos'}` : undefined}
+        subtitle={photos.length > 0 ? mediaLabelOf(photos.map((e) => e.photo)) : undefined}
       />
       {isLoading ? (
         <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4">
@@ -45,7 +46,7 @@ export function PhotosPage() {
       ) : photos.length === 0 ? (
         <EmptyState
           title="Todavía no hay fotos aquí."
-          message="Las fotos de cada recuerdo aparecerán en este lugar."
+          message="Las fotos y videos de cada recuerdo aparecerán en este lugar."
           action={
             <Button icon={<Plus className="size-5" />} onClick={() => compose()}>
               Añadir fotos

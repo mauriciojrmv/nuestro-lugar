@@ -9,7 +9,6 @@ interface Props {
   onBack: () => void
 }
 
-const photoWord = (n: number) => (n === 1 ? '1 foto' : `${n} fotos`)
 
 /** Preparing is quick; uploading is most of the wait. */
 function overall(state: Extract<SaveState, { status: 'working' }>) {
@@ -25,8 +24,8 @@ export function SaveStatus({ state, onRetry, onBack }: Props) {
       {state.status === 'working' && (
         <div className="w-full max-w-[300px]">
           <p className="text-[20px] font-semibold tracking-[-0.02em]">
-            {state.phase === 'preparing' && state.photoCount > 0 && `Preparando ${photoWord(state.photoCount)}…`}
-            {state.phase === 'uploading' && state.photoCount > 0 && `Subiendo ${photoWord(state.photoCount)}…`}
+            {state.phase === 'preparing' && state.photoCount > 0 && `Preparando ${state.mediaText}…`}
+            {state.phase === 'uploading' && state.photoCount > 0 && `Subiendo ${state.mediaText}…`}
             {(state.phase === 'saving' || state.photoCount === 0) && 'Guardando…'}
           </p>
           {state.photoCount > 0 && (

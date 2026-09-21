@@ -24,7 +24,11 @@ registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')))
  * Only successful CORS responses are stored; nothing is ever cached for the API.
  */
 registerRoute(
-  ({ url, request }) => request.method === 'GET' && url.pathname.includes('/storage/v1/object/sign/'),
+  ({ url, request }) =>
+    request.method === 'GET' &&
+    url.pathname.includes('/storage/v1/object/sign/') &&
+    // Videos stream with range requests; only images are cached.
+    /\.(jpe?g|png|webp|gif|avif)$/i.test(url.pathname),
   new CacheFirst({
     cacheName: PHOTO_CACHE,
     plugins: [

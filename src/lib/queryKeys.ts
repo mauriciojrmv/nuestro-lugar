@@ -4,4 +4,5 @@ export const qk = {
   letters: (coupleId: string | undefined) => ['letters', coupleId] as const,
   activity: (coupleId: string | undefined) => ['activity', coupleId] as const,
   notes: (coupleId: string | undefined) => ['notes', coupleId] as const,
+  usage: (coupleId: string | undefined) => ['usage', coupleId] as const,
 }
