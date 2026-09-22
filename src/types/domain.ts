@@ -69,6 +69,8 @@ export interface Note {
   authorId: string
   recipientId: string
   body: string
+  /** An instant photo from the camera, deleted together with the note. */
+  photoPath: string | null
   createdAt: string
 }
 
@@ -82,7 +84,7 @@ export interface Reply {
   pending?: boolean
 }
 
-export type ActivityKind = 'memory' | 'photos' | 'favorite' | 'letter' | 'note' | 'note_seen' | 'comment'
+export type ActivityKind = 'memory' | 'photos' | 'favorite' | 'letter' | 'note' | 'note_seen' | 'note_loved' | 'comment'
 
 export interface Activity {
   id: number

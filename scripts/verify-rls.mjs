@@ -169,6 +169,27 @@ ok(!readNote && gone?.length === 0, 'B reads it: the note is deleted for everyon
 const { data: seen } = await A.client.from('activity').select('kind, actor_id').eq('kind', 'note_seen')
 ok(seen?.length === 1 && seen[0].actor_id === B.id, 'A is told that B saw it')
 
+console.log('\nNotita reactions')
+const { data: n2 } = await A.client
+  .from('notes')
+  .insert({ couple_id: couple.id, author_id: A.id, recipient_id: B.id, body: 'otra' })
+  .select('id')
+  .single()
+await A.client.from('notes').update({ loved: true }).eq('id', n2.id)
+const { data: notLoved } = await B.client.from('notes').select('loved').eq('id', n2.id).single()
+ok(notLoved?.loved === false, 'the author cannot mark their own note as loved')
+const { error: bodyEdit } = await B.client.from('notes').update({ body: 'cambiada' }).eq('id', n2.id)
+ok(Boolean(bodyEdit), 'the recipient cannot rewrite it')
+const { error: loveErr } = await B.client.from('notes').update({ loved: true }).eq('id', n2.id)
+ok(!loveErr, 'the recipient loves it')
+await B.client.from('notes').delete().eq('id', n2.id)
+const { data: lovedAct } = await A.client.from('activity').select('kind').eq('kind', 'note_loved')
+ok(lovedAct?.length === 1, 'A is told "le encantó tu notita"')
+const { error: photoPathErr } = await A.client
+  .from('notes')
+  .insert({ couple_id: couple.id, author_id: A.id, recipient_id: B.id, body: '', photo_path: `couples/${crypto.randomUUID()}/notes/x.jpg` })
+ok(Boolean(photoPathErr), 'a note photo must live in the couple’s own folder')
+
 console.log('\nReplies and notifications')
 const { data: reply, error: replyErr } = await B.client
   .from('memory_comments')

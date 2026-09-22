@@ -27,6 +27,8 @@ registerRoute(
   ({ url, request }) =>
     request.method === 'GET' &&
     url.pathname.includes('/storage/v1/object/sign/') &&
+    // Notita photos are seen once: never kept on the device.
+    !url.pathname.includes('/notes/') &&
     // Videos stream with range requests; only images are cached.
     /\.(jpe?g|png|webp|gif|avif)$/i.test(url.pathname),
   new CacheFirst({

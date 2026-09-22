@@ -77,6 +77,7 @@ export const toNote = (r: NoteRow): Note => ({
   authorId: r.author_id,
   recipientId: r.recipient_id,
   body: r.body,
+  photoPath: r.photo_path,
   createdAt: r.created_at,
 })
 

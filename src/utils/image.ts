@@ -103,6 +103,17 @@ export async function prepareImage(file: File): Promise<PreparedImage> {
   }
 }
 
+/** A quick camera shot for a notita: light, since it's seen once and deleted. */
+export async function prepareSnapshot(file: File): Promise<Blob> {
+  const { source, width, height, release } = await decode(file)
+  try {
+    const { w, h } = scaleTo(width, height, Math.min(1, 1600 / Math.max(width, height)))
+    return await encode(source, w, h, 0.82)
+  } finally {
+    release()
+  }
+}
+
 /** Small square avatar. */
 export async function prepareAvatar(file: File): Promise<Blob> {
   const { source, width, height, release } = await decode(file)

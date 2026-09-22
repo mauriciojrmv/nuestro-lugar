@@ -95,6 +95,8 @@ export interface NoteRow {
   author_id: string
   recipient_id: string
   body: string
+  photo_path: string | null
+  loved: boolean
   created_at: string
 }
 
@@ -102,7 +104,7 @@ export interface ActivityRow {
   id: number
   couple_id: string
   actor_id: string | null
-  kind: 'memory' | 'photos' | 'favorite' | 'letter' | 'note' | 'note_seen' | 'comment'
+  kind: 'memory' | 'photos' | 'favorite' | 'letter' | 'note' | 'note_seen' | 'note_loved' | 'comment'
   memory_id: string | null
   letter_id: string | null
   note_id: string | null

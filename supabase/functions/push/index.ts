@@ -21,9 +21,10 @@ type Activity = {
   id: number
   couple_id: string
   actor_id: string | null
-  kind: 'memory' | 'photos' | 'favorite' | 'letter' | 'note' | 'note_seen' | 'comment'
+  kind: 'memory' | 'photos' | 'favorite' | 'letter' | 'note' | 'note_seen' | 'note_loved' | 'comment'
   memory_id: string | null
   letter_id: string | null
+  note_id: string | null
   photo_count: number
   video_count: number
 }
@@ -37,7 +38,7 @@ function media(a: Activity) {
     .join(' y ')
 }
 
-function message(a: Activity, name: string, memoryAuthor: string | null, recipient: string) {
+function message(a: Activity, name: string, memoryAuthor: string | null, recipient: string, noteHasPhoto: boolean) {
   const memoryUrl = a.memory_id ? `#/recuerdo/${a.memory_id}` : '#/'
   switch (a.kind) {
     case 'memory':
@@ -55,9 +56,11 @@ function message(a: Activity, name: string, memoryAuthor: string | null, recipie
     case 'letter':
       return { body: `${name} te escribió una cartita.`, url: a.letter_id ? `#/cartitas/${a.letter_id}` : '#/cartitas' }
     case 'note':
-      return { body: `${name} te dejó una notita.`, url: '#/' }
+      return { body: noteHasPhoto ? `${name} te dejó una notita con foto.` : `${name} te dejó una notita.`, url: '#/' }
     case 'note_seen':
       return { body: `${name} vio tu notita.`, url: '#/' }
+    case 'note_loved':
+      return { body: `A ${name} le encantó tu notita.`, url: '#/' }
     case 'comment':
       return { body: `${name} respondió a ${memoryAuthor === recipient ? 'tu' : 'un'} recuerdo.`, url: memoryUrl }
   }
@@ -68,11 +71,14 @@ Deno.serve(async (req) => {
   const { activity_id } = await req.json().catch(() => ({}))
   if (!activity_id) return new Response('bad request', { status: 400 })
 
-  // A memory's photo count is folded in right after it's created: wait for it.
-  await new Promise((r) => setTimeout(r, 2500))
-
-  const { data: a } = await admin.from('activity').select('*').eq('id', activity_id).maybeSingle<Activity>()
-  if (!a || !a.actor_id) return new Response('gone', { status: 200 }) // e.g. a note taken back
+  let { data: a } = await admin.from('activity').select('*').eq('id', activity_id).maybeSingle<Activity>()
+  if (!a || !a.actor_id) return new Response('gone', { status: 200 })
+  if (a.kind === 'memory') {
+    // A memory's photo count is folded in right after it's created: wait for it.
+    await new Promise((r) => setTimeout(r, 2500))
+    ;({ data: a } = await admin.from('activity').select('*').eq('id', activity_id).maybeSingle<Activity>())
+    if (!a || !a.actor_id) return new Response('gone', { status: 200 })
+  }
 
   const { data: members } = await admin
     .from('couple_members')
@@ -90,14 +96,26 @@ Deno.serve(async (req) => {
     memoryAuthor = m?.created_by ?? null
   }
 
+  let noteHasPhoto = false
+  if (a.kind === 'note' && a.note_id) {
+    const { data: n } = await admin.from('notes').select('photo_path').eq('id', a.note_id).maybeSingle()
+    if (!n) return new Response('gone', { status: 200 }) // taken back already
+    noteHasPhoto = Boolean(n.photo_path)
+  }
+
   const { data: subs } = await admin.from('push_subscriptions').select('*').in('user_id', recipients)
   let sent = 0
   await Promise.all(
     (subs ?? []).map(async (s) => {
-      const msg = message(a, name, memoryAuthor, s.user_id)
-      const payload = JSON.stringify({ title: 'Nuestro Lugar', body: msg.body, url: msg.url, tag: `${a.kind}-${a.memory_id ?? a.id}` })
+      const msg = message(a!, name, memoryAuthor, s.user_id, noteHasPhoto)
+      const payload = JSON.stringify({ title: 'Nuestro Lugar', body: msg.body, url: msg.url, tag: `${a!.kind}-${a!.memory_id ?? a!.id}` })
       try {
-        await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload, { TTL: 60 * 60 * 24 })
+        // "high" = deliver now. With the default, Apple and Google may hold the
+        // notification (battery saving) until the phone wakes or the app opens.
+        await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload, {
+          TTL: 60 * 60 * 24,
+          urgency: 'high',
+        })
         sent++
       } catch (error) {
         const status = (error as { statusCode?: number }).statusCode

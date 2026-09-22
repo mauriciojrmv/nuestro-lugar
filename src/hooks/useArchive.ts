@@ -147,8 +147,8 @@ export function useRemoveNote() {
   const { couple } = useCouple()
   const key = qk.notes(couple?.id)
   return useMutation({
-    mutationFn: (note: Note) => removeNote(note.id),
-    onMutate: async (note) => {
+    mutationFn: ({ note, loved }: { note: Note; loved?: boolean }) => removeNote(note, loved),
+    onMutate: async ({ note }) => {
       await client.cancelQueries({ queryKey: key })
       const previous = client.getQueryData<Note[]>(key)
       client.setQueryData<Note[]>(key, (list) => list?.filter((n) => n.id !== note.id))

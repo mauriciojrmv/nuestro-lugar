@@ -10,6 +10,7 @@ import { useCouple } from '@/providers/CoupleProvider'
 import { useOnline } from '@/hooks/useOnline'
 import { useRealtimeSync } from '@/hooks/useRealtimeSync'
 import { FloatingNotes } from '@/components/notes/FloatingNotes'
+import { useLetters } from '@/hooks/useArchive'
 
 interface Tab {
   to: string
@@ -34,6 +35,9 @@ export function AppShell() {
   const compose = useComposer()
   const { me, partner } = useCouple()
   const showFab = FAB_ROUTES.includes(location.pathname)
+  // Unread letters: a count on "Más", where Cartitas lives.
+  const { data: letters } = useLetters()
+  const unreadLetters = (letters ?? []).filter((l) => l.recipientId === me?.id && !l.readAt).length
 
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[248px_1fr]">
@@ -149,6 +153,14 @@ export function AppShell() {
                     )}
                   >
                     <Icon active={isActive} />
+                    {to === '/mas' && unreadLetters > 0 && (
+                      <span
+                        className="absolute -top-1 right-1.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-rose px-1 text-[11px] font-bold text-white ring-2 ring-bg"
+                        aria-label={`${unreadLetters} cartitas sin leer`}
+                      >
+                        {unreadLetters}
+                      </span>
+                    )}
                   </span>
                   {label}
                 </>

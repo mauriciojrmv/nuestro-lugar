@@ -10,6 +10,7 @@ import { EmptyState, ErrorState, Skeleton } from '@/components/ui/Feedback'
 import { MemoryCard } from '@/components/memory/MemoryCard'
 import { InviteCode } from '@/components/couple/InviteCode'
 import { NotesWaiting } from '@/components/notes/FloatingNotes'
+import { UnreadLetters } from '@/components/letters/UnreadLetters'
 import { useStorageUsage } from '@/hooks/useStorageUsage'
 import { usePush } from '@/hooks/usePush'
 import { usePreference } from '@/hooks/usePreference'
@@ -49,6 +50,7 @@ export function HomePage() {
         </div>
       </header>
 
+      <UnreadLetters />
       <NotesWaiting />
 
       {complete && <PushInvite partnerName={partner ? nameOf(partner.id) : ''} />}

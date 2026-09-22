@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'motion/react'
+import { Camera, Heart } from 'lucide-react'
+import { SignedImage } from '@/components/ui/SignedImage'
+import { useComposer } from '@/providers/ComposerProvider'
 import { useNotes, useRemoveNote } from '@/hooks/useArchive'
 import { useAuth } from '@/providers/AuthProvider'
 import { useCouple } from '@/providers/CoupleProvider'
@@ -23,6 +26,8 @@ export function FloatingNotes() {
   const remove = useRemoveNote()
   const toast = useToast()
   const [open, setOpen] = useState<Note | null>(null)
+  const [loved, setLoved] = useState(false)
+  const compose = useComposer()
 
   const incoming = (notes ?? []).filter((n) => n.recipientId === user?.id)
   const top = incoming[0]
@@ -35,10 +40,21 @@ export function FloatingNotes() {
     return () => window.removeEventListener('keydown', onKey)
   })
 
-  const close = () => {
+  /** Closing deletes it. "loved" lets the author know it was loved, not just seen. */
+  const close = (asLoved = false, then?: () => void) => {
     const note = open
-    setOpen(null)
-    if (note) remove.mutate(note, { onError: (e) => toast({ message: humanizeError(e), tone: 'error' }) })
+    if (!note) return
+    const finish = () => {
+      setOpen(null)
+      setLoved(false)
+      remove.mutate({ note, loved: asLoved }, { onError: (e) => toast({ message: humanizeError(e), tone: 'error' }) })
+      then?.()
+    }
+    if (asLoved) {
+      // A beat for the heart to pop before the note flies away.
+      setLoved(true)
+      setTimeout(finish, 650)
+    } else finish()
   }
 
   return createPortal(
@@ -83,7 +99,10 @@ export function FloatingNotes() {
                 <span className="block font-serif text-[16px] leading-tight italic">
                   {incoming.length === 1 ? 'Una notita de' : `${incoming.length} notitas de`} {nameOf(top.authorId)}
                 </span>
-                <span className="mt-1.5 block text-[12px] font-semibold tracking-[0.02em] opacity-60">Toca para leer</span>
+                <span className="mt-1.5 flex items-center gap-1.5 text-[12px] font-semibold tracking-[0.02em] opacity-60">
+                  {top.photoPath && <Camera className="size-3.5" strokeWidth={2.2} />}
+                  {top.photoPath ? 'Con foto · toca para ver' : 'Toca para leer'}
+                </span>
               </span>
             </motion.button>
           </motion.div>
@@ -102,25 +121,54 @@ export function FloatingNotes() {
             aria-modal="true"
             aria-label={`Notita de ${nameOf(open.authorId)}`}
           >
-            <div className="absolute inset-0 bg-black/55 backdrop-blur-md" onClick={close} aria-hidden />
+            <div className="absolute inset-0 bg-black/55 backdrop-blur-md" onClick={() => close()} aria-hidden />
             <motion.div
               initial={{ scale: 0.6, rotate: -8, y: 180, x: -80 }}
               animate={{ scale: 1, rotate: -1.5, y: 0, x: 0 }}
               exit={{ y: -window.innerHeight * 0.75, x: 80, rotate: 16, scale: 0.75, opacity: 0, transition: { duration: 0.65, ease: [0.4, 0, 0.9, 0.6] } }}
               transition={{ type: 'spring', stiffness: 200, damping: 19 }}
-              className={`relative w-full max-w-[360px] rounded-[8px] px-7 pt-9 pb-6 ${PAPER} shadow-[0_30px_80px_rgb(0_0_0/0.45)]`}
+              className={`relative max-h-[88dvh] w-full max-w-[360px] overflow-y-auto rounded-[8px] px-6 pt-8 pb-5 ${PAPER} shadow-[0_30px_80px_rgb(0_0_0/0.45)]`}
             >
               <span aria-hidden className="absolute -top-2.5 left-1/2 h-5 w-16 -translate-x-1/2 rotate-2 rounded-[2px] bg-white/55" />
-              <p className="font-serif text-[25px] leading-[1.45] whitespace-pre-wrap text-pretty">{open.body}</p>
-              <p className="mt-5 text-right font-serif text-[18px] italic opacity-70">— {nameOf(open.authorId)}</p>
+              {open.photoPath && (
+                // Polaroid-style instant photo
+                <div className="-rotate-1 bg-white p-2 pb-6 shadow-[0_6px_18px_rgb(0_0_0/0.18)]">
+                  <SignedImage path={open.photoPath} eager frameClassName="aspect-[3/4] w-full" alt={`Foto de ${nameOf(open.authorId)}`} />
+                </div>
+              )}
+              {open.body && (
+                <p className={`${open.photoPath ? 'mt-5 text-[22px]' : 'text-[25px]'} font-serif leading-[1.45] whitespace-pre-wrap text-pretty`}>{open.body}</p>
+              )}
+              <p className="mt-4 text-right font-serif text-[18px] italic opacity-70">— {nameOf(open.authorId)}</p>
               <p className="mt-1 text-right text-[13px] opacity-50">{timeAgo(open.createdAt)}</p>
+              <div className="mt-5 flex gap-2">
+                <button
+                  onClick={() => close(true)}
+                  disabled={loved}
+                  aria-label="Me encanta"
+                  className="relative grid h-12 flex-1 place-items-center rounded-[14px] bg-[#a4505a] text-[16px] font-semibold text-white active:scale-[0.98]"
+                >
+                  <span className="flex items-center gap-2">
+                    <motion.span animate={loved ? { scale: [1, 1.6, 1.2] } : { scale: 1 }} transition={{ duration: 0.45 }}>
+                      <Heart className="size-5 fill-white" strokeWidth={0} />
+                    </motion.span>
+                    Me encanta
+                  </span>
+                </button>
+                <button
+                  onClick={() => close()}
+                  className="h-12 flex-1 rounded-[14px] bg-[#2b2118] text-[16px] font-semibold text-[#f6ecd9] active:scale-[0.98]"
+                >
+                  Cerrar
+                </button>
+              </div>
               <button
-                onClick={close}
-                className="mt-6 h-12 w-full rounded-[14px] bg-[#2b2118] text-[17px] font-semibold text-[#f6ecd9] active:scale-[0.98]"
+                onClick={() => close(false, () => compose({ mode: 'note' }))}
+                className="mt-2 h-11 w-full rounded-[14px] text-[15px] font-semibold text-[#2b2118]/75 active:opacity-60"
               >
-                Cerrar
+                Responder con otra notita
               </button>
-              <p className="mt-3 text-center text-[13px] opacity-60">Al cerrarla, desaparece.</p>
+              <p className="mt-1 text-center text-[13px] opacity-60">Al cerrarla, desaparece.</p>
             </motion.div>
           </motion.div>
         )}
@@ -146,7 +194,7 @@ export function NotesWaiting() {
         <div key={n.id} className="flex min-h-12 items-center justify-between gap-3 rounded-[16px] bg-surface px-4 py-2">
           <span className="text-[15px] text-muted">Tu notita para {nameOf(n.recipientId)} aún no la ha visto.</span>
           <button
-            onClick={() => remove.mutate(n, { onSuccess: () => toast({ message: 'Notita retirada.' }) })}
+            onClick={() => remove.mutate({ note: n }, { onSuccess: () => toast({ message: 'Notita retirada.' }) })}
             className="-mr-2 h-11 shrink-0 rounded-full px-3 text-[15px] font-semibold text-accent active:opacity-50"
           >
             Retirar
